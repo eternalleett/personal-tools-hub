@@ -33,18 +33,25 @@ if(image.nodeName.toLowerCase()==='svg')thumb.append(document.importNode(image,t
 const name=document.createElement('span');name.className='jl-gallery-name';name.textContent=entry.name;open.append(thumb,name);
 open.onclick=()=>{
  clearTimeout(updateTimer);
- if(active>=0 && active!==i && !selecting) synchronizeActive();
+ // Finish the previous label's edits before changing the active document.
+ if(active>=0 && active!==i) synchronizeActive();
  selecting=true;
  active=-1;
- const target=JSON.parse(JSON.stringify(saved[i].layout));
- load(target);
- active=i;
- selecting=false;
- // Redraw using the selected record and refresh its live thumbnail.
- draw();
- synchronizeActive();
- renderGallery();
- message.textContent='Now previewing '+saved[i].name+' ('+(i+1)+' of '+saved.length+').';
+ try{
+   const requested=JSON.parse(JSON.stringify(saved[i].layout));
+   const loaded=window.JLLabelEditor.loadLayout(requested);
+   // Verify editor model and rendered canvas both contain the selected text.
+   const requestedTexts=loaded.elements.filter(e=>e.type==='text').map(e=>e.text);
+   const canvasText=[...document.querySelectorAll('#design g.item text')].map(n=>n.textContent);
+   if(requestedTexts.some(t=>!canvasText.includes(t))){
+     throw Error('Canvas did not display the selected saved label');
+   }
+   active=i;
+   renderGallery();
+   message.textContent='Previewing '+saved[i].name+' ('+(i+1)+' of '+saved.length+').';
+ }catch(error){
+   message.textContent='Unable to switch label: '+error.message;
+ }finally{selecting=false}
 };
 const remove=document.createElement('button');remove.type='button';remove.className='jl-gallery-delete';remove.title='Delete '+entry.name;remove.setAttribute('aria-label','Delete '+entry.name);remove.textContent='×';
 remove.onclick=()=>{clearTimeout(updateTimer);saved.splice(i,1);if(active===i)active=-1;else if(active>i)active--;renderGallery();message.textContent='Label deleted'};
@@ -60,7 +67,7 @@ document.getElementById('jlNewLabel').onclick=()=>{
   copy.name=(source.name||'Untitled label')+' - Copy';
   clearTimeout(updateTimer);
   active=-1;
-  load(copy);
+  window.JLLabelEditor.loadLayout(copy);
   saved.push(snapshot());
   active=saved.length-1;
   renderGallery();
