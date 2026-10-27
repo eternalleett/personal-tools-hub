@@ -1,33 +1,32 @@
-/* Managed label collection: thumbnails, layout names, editing, deletion and print sheets. */
-(function(){
- const panel=document.getElementById('jlPaper').closest('.jl-print-panel');
- const controls=document.createElement('div');controls.className='bar';
- const saveBtn=document.createElement('button');saveBtn.textContent='Save current as new label';
- const updateBtn=document.createElement('button');updateBtn.textContent='Update selected label';
- controls.append(saveBtn,updateBtn);
- const list=document.createElement('div');list.className='jl-label-library';
- const note=document.createElement('p');note.className='hint';
- const manager=document.querySelector('.controls')||panel;
- const title=document.createElement('h3');title.textContent='Saved labels';
- manager.append(title,controls,list,note);
- let records=[],active=-1;
- const snap=()=>({layout:JSON.parse(JSON.stringify(model)),svg:renderedSvg(),name:model.name||'Untitled Label'});
- function repaint(){
-   list.replaceChildren();note.textContent=records.length+' saved labels in this session.';
-   records.forEach((record,i)=>{
-     const card=document.createElement('div');card.className='jl-label-item'+(i===active?' active':'');
-     const preview=document.createElement('div');preview.className='jl-label-thumb';
-     const svg=new DOMParser().parseFromString(record.svg,'image/svg+xml').documentElement;
-     if(svg.nodeName.toLowerCase()==='svg')preview.append(document.importNode(svg,true));
-     const content=document.createElement('div');const name=document.createElement('strong');name.textContent=record.name||'Untitled Label';
-     const actions=document.createElement('div');actions.className='bar';
-     const edit=document.createElement('button');edit.textContent='Edit';edit.className='alt';edit.onclick=()=>{active=i;load(JSON.parse(JSON.stringify(records[i].layout)));document.querySelector('.jl-view-tabs [data-view="editor"]')?.click();repaint()};
-     const del=document.createElement('button');del.textContent='Delete';del.className='warn';del.onclick=()=>{records.splice(i,1);if(active===i)active=-1;else if(active>i)active--;repaint()};
-     actions.append(edit,del);content.append(name,actions);card.append(preview,content);list.append(card);
-   });
- }
- saveBtn.onclick=()=>{records.push(snap());active=records.length-1;repaint()};
- updateBtn.onclick=()=>{if(active<0){note.textContent='Choose Edit on a saved label first.';return}records[active]=snap();repaint()};
- JLPrintSheet.init(()=>records.length?records.map(x=>({svg:x.svg})):[{svg:renderedSvg()}]);
- repaint();
+/* Horizontal saved-label gallery, editable cards and print collection. */
+(()=>{
+'use strict';
+const canvasPanel=document.getElementById('stage').closest('.panel');
+const strip=document.createElement('section');strip.className='jl-collection';
+strip.innerHTML='<div class="jl-collection-header"><strong>My labels</strong><div class="jl-collection-actions"><button id="jlSaveLabel" type="button">Save current</button><button id="jlNewLabel" type="button" class="alt">+ New label</button><button id="jlUpdateLabel" type="button" class="alt">Update selected</button></div></div><div class="jl-gallery" id="jlLabelGallery" aria-label="Saved labels"></div><p class="hint" id="jlLabelMessage"></p>';
+canvasPanel.insertBefore(strip,canvasPanel.querySelector('#stage'));
+const gallery=strip.querySelector('#jlLabelGallery'),message=strip.querySelector('#jlLabelMessage');
+let saved=[],active=-1;
+const snapshot=()=>({layout:JSON.parse(JSON.stringify(model)),svg:renderedSvg(),name:model.name||'Untitled label'});
+function renderGallery(){
+gallery.replaceChildren();
+saved.forEach((entry,i)=>{
+const card=document.createElement('div');card.className='jl-gallery-card'+(active===i?' active':'');
+const open=document.createElement('button');open.type='button';open.className='jl-gallery-open';open.title='Edit '+entry.name;
+const thumb=document.createElement('div');thumb.className='jl-gallery-preview';
+const image=new DOMParser().parseFromString(entry.svg,'image/svg+xml').documentElement;
+if(image.nodeName.toLowerCase()==='svg')thumb.append(document.importNode(image,true));
+const name=document.createElement('span');name.className='jl-gallery-name';name.textContent=entry.name;open.append(thumb,name);
+open.onclick=()=>{active=i;load(JSON.parse(JSON.stringify(entry.layout)));renderGallery();message.textContent='Editing '+entry.name+'. Select Update selected to save changes.'};
+const remove=document.createElement('button');remove.type='button';remove.className='jl-gallery-delete';remove.title='Delete '+entry.name;remove.setAttribute('aria-label','Delete '+entry.name);remove.textContent='×';
+remove.onclick=()=>{saved.splice(i,1);if(active===i)active=-1;else if(active>i)active--;renderGallery();message.textContent='Label deleted'};
+card.append(open,remove);gallery.append(card);
+});
+message.textContent=saved.length+' saved label(s) in this session';
+}
+document.getElementById('jlSaveLabel').onclick=()=>{saved.push(snapshot());active=saved.length-1;renderGallery();gallery.lastElementChild?.scrollIntoView({block:'nearest',inline:'end',behavior:'smooth'})};
+document.getElementById('jlNewLabel').onclick=()=>{active=-1;load({version:1,name:'New Label',width:model.width,height:model.height,elements:[]});renderGallery();message.textContent='Blank label created. Add elements and click Save current.'};
+document.getElementById('jlUpdateLabel').onclick=()=>{if(active<0){message.textContent='Select a saved label first';return}saved[active]=snapshot();renderGallery();message.textContent='Saved changes'};
+JLPrintSheet.init(()=>saved.length?saved.map(s=>({svg:s.svg})):[{svg:renderedSvg()}]);
+renderGallery();
 })();
