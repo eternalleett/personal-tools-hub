@@ -49,6 +49,8 @@
 
   function applyTheme() {
     document.body.classList.toggle('jl-dark', dark);
+    document.documentElement.classList.toggle('jl-dark', dark);
+    document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
     const active = colors[dark ? 'dark' : 'light'];
     for (const [key, color] of Object.entries(active)) {
       root.style.setProperty('--jl-' + key, color);
