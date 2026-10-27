@@ -5,10 +5,23 @@ const canvasPanel=document.getElementById('stage').closest('.panel');
 const strip=document.createElement('section');strip.className='jl-collection';
 strip.innerHTML='<div class="jl-collection-header"><strong>My labels <span id="jlLabelCount" class="jl-label-count" aria-live="polite">0</span></strong><div class="jl-collection-actions"><button id="jlSaveLabel" type="button">Save current</button><button id="jlNewLabel" type="button" class="alt">+ New label</button><button id="jlUpdateLabel" type="button" class="alt">Update selected</button></div></div><div class="jl-gallery" id="jlLabelGallery" aria-label="Saved labels"></div><p class="hint" id="jlLabelMessage"></p>';
 canvasPanel.insertBefore(strip,canvasPanel.querySelector('#stage'));
+const indicator=document.createElement('div');
+indicator.className='jl-active-label';
+indicator.setAttribute('role','status');
+indicator.setAttribute('aria-live','polite');
+canvasPanel.insertBefore(indicator,canvasPanel.querySelector('#stage'));
+function updateIndicator(){
+ const current=saved[active];
+ indicator.textContent=current
+   ? 'Previewing label '+(active+1)+' of '+saved.length+': '+(model.name||current.name)
+   : 'Previewing unsaved label: '+(model.name||'Untitled label');
+ indicator.dataset.selected=active<0?'unsaved':String(active);
+}
 const gallery=strip.querySelector('#jlLabelGallery'),message=strip.querySelector('#jlLabelMessage');
-let saved=[],active=-1,updateTimer=null;
+let saved=[],active=-1,updateTimer=null,selecting=false;
 const snapshot=()=>({layout:JSON.parse(JSON.stringify(model)),svg:renderedSvg(),name:model.name||'Untitled label'});
 function renderGallery(){
+updateIndicator();
 document.getElementById('jlLabelCount').textContent=String(saved.length);
 gallery.replaceChildren();
 saved.forEach((entry,i)=>{
@@ -18,9 +31,21 @@ const thumb=document.createElement('div');thumb.className='jl-gallery-preview';
 const image=new DOMParser().parseFromString(entry.svg,'image/svg+xml').documentElement;
 if(image.nodeName.toLowerCase()==='svg')thumb.append(document.importNode(image,true));
 const name=document.createElement('span');name.className='jl-gallery-name';name.textContent=entry.name;open.append(thumb,name);
-open.onclick=()=>{active=-1;load(JSON.parse(JSON.stringify(entry.layout)));active=i;renderGallery();message.textContent='Editing '+entry.name+'. Select Update selected to save changes.'};
+open.onclick=()=>{
+ clearTimeout(updateTimer);
+ if(active>=0 && active!==i && !selecting) synchronizeActive();
+ selecting=true;
+ active=-1;
+ load(JSON.parse(JSON.stringify(saved[i].layout)));
+ active=i;
+ selecting=false;
+ // Force a fresh canvas draw after selecting a different saved label.
+ draw();
+ renderGallery();
+ message.textContent='Now previewing '+saved[i].name+' ('+(i+1)+' of '+saved.length+').';
+};
 const remove=document.createElement('button');remove.type='button';remove.className='jl-gallery-delete';remove.title='Delete '+entry.name;remove.setAttribute('aria-label','Delete '+entry.name);remove.textContent='×';
-remove.onclick=()=>{saved.splice(i,1);if(active===i)active=-1;else if(active>i)active--;renderGallery();message.textContent='Label deleted'};
+remove.onclick=()=>{clearTimeout(updateTimer);saved.splice(i,1);if(active===i)active=-1;else if(active>i)active--;renderGallery();message.textContent='Label deleted'};
 card.append(open,remove);gallery.append(card);
 });
 message.textContent=saved.length+' saved label(s) in this session';
@@ -31,6 +56,7 @@ document.getElementById('jlNewLabel').onclick=()=>{
   const source=saved.length?saved[saved.length-1].layout:model;
   const copy=JSON.parse(JSON.stringify(source));
   copy.name=(source.name||'Untitled label')+' - Copy';
+  clearTimeout(updateTimer);
   active=-1;
   load(copy);
   saved.push(snapshot());
@@ -42,7 +68,7 @@ document.getElementById('jlNewLabel').onclick=()=>{
 document.getElementById('jlUpdateLabel').onclick=()=>{if(active<0){message.textContent='Select a saved label first';return}saved[active]=snapshot();renderGallery();message.textContent='Saved changes'};
 // Synchronize the active saved label while typing, dragging, or changing styling.
 function synchronizeActive(){
- if(active<0 || !saved[active])return;
+ if(selecting || active<0 || !saved[active])return;
  saved[active]=snapshot();
  const card=gallery.children[active];
  if(!card)return;
@@ -53,9 +79,11 @@ function synchronizeActive(){
    if(svg.nodeName.toLowerCase()==='svg')preview.replaceChildren(document.importNode(svg,true));
  }
  if(label)label.textContent=saved[active].name;
+ updateIndicator();
 }
 document.addEventListener('jl:label-changed',()=>{
- if(active<0)return;
+ if(selecting || active<0)return;
+ updateIndicator();
  clearTimeout(updateTimer);
  updateTimer=setTimeout(synchronizeActive,90);
 });
