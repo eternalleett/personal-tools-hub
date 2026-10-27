@@ -148,3 +148,21 @@ body :is(input:not([type=color]),select,textarea){color:var(--jl-ink);border-col
 .jl-sheet-tab .jl-sheet-preview{min-width:0;background:var(--jl-surface)}
 .jl-sheet-tab .jl-sheet-preview canvas{max-width:100%}
 @media(max-width:650px){.jl-tool-page .jl-function-finder{display:block}.jl-tool-page .jl-function-finder input{width:100%;max-width:100%;margin-top:7px}.jl-sheet-tab .jl-sheets{grid-template-columns:1fr}}
+
+/* Horizontal item galleries above the editor previews. */
+.jl-collection{width:100%;max-width:100%;min-width:0;margin:0 0 17px}
+.jl-collection-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:9px}
+.jl-collection-header strong{font-size:15px}
+.jl-collection-actions{display:flex;gap:7px;flex-wrap:wrap}
+.jl-collection-actions button{font-size:12px;padding:7px 11px;min-height:34px!important}
+.jl-gallery{display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:5px 3px 12px;max-width:100%;scrollbar-width:thin}
+.jl-gallery-card{position:relative;flex:0 0 152px;width:152px;min-width:0;border:1px solid var(--jl-border);border-radius:12px;padding:7px;background:var(--jl-surface);scroll-snap-align:start}
+.jl-gallery-card.active{border:2px solid var(--jl-accent);padding:6px}
+.jl-gallery-open{display:flex!important;flex-direction:column;gap:7px;background:transparent!important;color:var(--jl-ink)!important;width:100%;padding:0!important;border:0!important;text-align:left;cursor:pointer}
+.jl-gallery-preview{height:104px;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:7px;background:#fff;padding:6px}
+.jl-gallery-preview svg{max-height:100%;max-width:100%;width:auto;height:auto;object-fit:contain}
+.jl-gallery-name{font-size:12px;font-weight:650;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.jl-gallery-delete{position:absolute;right:3px;top:3px;width:29px;height:29px;min-height:29px!important;border:1px solid #f4b6bb!important;border-radius:50%!important;background:#fff1f2!important;color:#a6192e!important;font-weight:900;font-size:19px;line-height:1;padding:0!important;z-index:2}
+.jl-gallery-delete:hover{background:#fecdd3!important}
+.jl-collection .hint{margin:3px 0;font-size:12px}
+@media(max-width:650px){.jl-gallery-card{flex-basis:133px;width:133px}.jl-gallery-preview{height:91px}.jl-collection-header{align-items:flex-start}.jl-collection-actions{width:100%}.jl-collection-actions button{flex:1}}
