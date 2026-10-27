@@ -90,3 +90,10 @@ body,main,.page,.wrap{min-width:0}
 .jl-tool-page :is(.jl-canvas,.jl-controls){min-width:0}
 }
 @media(max-width:370px){.jl-bar{gap:5px}.jl-brand{font-size:18px}.jl-bar-actions{gap:4px}}
+
+/* The theme bootstraps on <html> before the body exists. */
+html.jl-dark{--jl-top:#080e1d;--jl-menu:#111c32;--jl-main:#101827;--jl-surface:#1b2940;--jl-ink:#edf3ff;--jl-link:#a6d8ff;color-scheme:dark;background:var(--jl-main)}
+html.jl-dark body{background:var(--jl-main)!important;color:var(--jl-ink)!important}
+html.jl-dark body :is(.card,.panel){background:var(--jl-surface)!important;color:var(--jl-ink)!important}
+html.jl-dark body a:not(.jl-bar a):not(.jl-menu a){color:var(--jl-link)!important}
+@media(max-width:760px){.jl-bar{grid-template-columns:36px minmax(0,1fr) auto!important}.jl-bar-center{grid-column:1/-1!important;grid-row:2!important}.jl-bar-actions{grid-column:3!important;grid-row:1!important}}
