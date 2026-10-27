@@ -130,3 +130,6 @@ body :is(input:not([type=color]),select,textarea){color:var(--jl-ink);border-col
 .jl-tool-page .jl-canvas,.jl-tool-page .jl-controls{border-color:var(--jl-border)!important}
 .jl-theme-popover{max-height:calc(100vh - 95px);overflow:auto}
 .jl-theme-popover select{min-width:0;max-width:170px;border-radius:7px}
+
+/* Keep native hidden attributes effective despite component layout rules. */
+#jlCustomPaper[hidden],.jl-theme-popover[hidden]{display:none!important}
