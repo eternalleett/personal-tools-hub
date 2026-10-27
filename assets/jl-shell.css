@@ -108,3 +108,12 @@ html.jl-dark body a:not(.jl-bar a):not(.jl-menu a){color:var(--jl-link)!importan
 @media(max-width:760px){
 .jl-bar>.jl-brand{grid-column:2;grid-row:1;justify-self:center}
 }
+
+/* Input file overflow repair: native file controls have an intrinsic min width. */
+.jl-tool-page input[type="file"]{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important;font-size:12px!important;white-space:normal!important;overflow:hidden!important;color:var(--jl-ink)}
+.jl-tool-page input[type="file"]::file-selector-button{max-width:100%;font:inherit;margin:0 6px 4px 0;padding:8px;border-radius:7px}
+.jl-controls,.jl-controls label,.jl-controls .options{min-width:0;max-width:100%;overflow-wrap:anywhere}
+:root{--jl-font:system-ui,-apple-system,"Segoe UI",sans-serif}
+body,button,input,select,textarea{font-family:var(--jl-font)!important}
+@media(min-width:761px){.jl-bar{grid-template-columns:44px minmax(150px,1fr) minmax(200px,400px) auto!important}.jl-bar>.jl-brand{grid-column:2!important;justify-self:center}.jl-bar>.jl-bar-center{grid-column:3!important;justify-self:stretch;max-width:none}.jl-bar>.jl-bar-actions{grid-column:4!important}}
+@media(max-width:760px){.jl-bar>.jl-bar-center{grid-column:1/-1!important;grid-row:2!important}}
