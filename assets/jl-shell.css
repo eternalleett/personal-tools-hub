@@ -133,3 +133,18 @@ body :is(input:not([type=color]),select,textarea){color:var(--jl-ink);border-col
 
 /* Keep native hidden attributes effective despite component layout rules. */
 #jlCustomPaper[hidden],.jl-theme-popover[hidden]{display:none!important}
+
+/* Compact toolkit pages: remove artificial blank preview and page height. */
+.jl-tool-page .jl-canvas{min-height:0!important}
+.jl-tool-page .jl-canvas .preview:empty,.jl-tool-page #preview:empty{min-height:120px}
+.jl-tool-page .jl-print-panel{margin-bottom:18px}
+.jl-tool-page .jl-function-finder{position:relative;display:flex;align-items:center;gap:12px;flex-wrap:wrap;max-width:760px;padding:8px 0 12px}
+.jl-tool-page .jl-function-finder label{font-size:13px;font-weight:700;white-space:nowrap}
+.jl-tool-page .jl-function-finder input{flex:1;min-width:180px;max-width:450px;border:1px solid var(--jl-border);border-radius:9px;padding:9px}
+.jl-function-matches{width:100%;display:flex;gap:6px;flex-wrap:wrap}
+.jl-function-matches[hidden]{display:none}
+.jl-function-matches button{background:var(--jl-surface)!important;color:var(--jl-ink)!important;border:1px solid var(--jl-border)!important;padding:7px 10px;border-radius:8px;min-height:35px}
+.jl-sheet-tab .jl-sheets{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));max-height:none;overflow:visible}
+.jl-sheet-tab .jl-sheet-preview{min-width:0;background:var(--jl-surface)}
+.jl-sheet-tab .jl-sheet-preview canvas{max-width:100%}
+@media(max-width:650px){.jl-tool-page .jl-function-finder{display:block}.jl-tool-page .jl-function-finder input{width:100%;max-width:100%;margin-top:7px}.jl-sheet-tab .jl-sheets{grid-template-columns:1fr}}
