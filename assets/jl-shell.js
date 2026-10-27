@@ -1,1 +1,152 @@
-(()=>{const root=document.documentElement;const base=new URL(document.currentScript.src).href.replace(/assets\/jl-shell\.js(?:\?.*)?$/,'');const tools=[['QR & Barcode Generator','tools/qr-barcode/','qr barcode link url generator code128 批量 條碼 二維碼'],['PDF Toolkit','tools/pdf-toolkit/','pdf merge split reorder watermark convert word excel ppt markdown 合併 浮水印'],['Image Toolkit','tools/image-toolkit/','image photo jpg png webp avif bmp ico convert compress 圖片 轉檔'],['Label Designer','tools/label-designer/','label barcode qr print typography dpi printer 標籤 列印'],['CSV to vCard','tools/csv-vcard/','csv contacts phone address book vcf iphone contact import 聯絡人 通訊錄']];const saved=(()=>{try{return JSON.parse(localStorage.getItem('jl-theme')||'{}')}catch{return {}}})();let state={dark:false,top:'#14213b',menu:'#1d2d48',main:'#f4f6fb',accent:'#4a5ed5',...saved};function apply(){document.body.classList.toggle('jl-dark',!!state.dark);for(const k of ['top','menu','main','accent'])root.style.setProperty('--jl-'+k,state[k]);try{localStorage.setItem('jl-theme',JSON.stringify(state))}catch{}}function tag(n,props={},txt){let e=document.createElement(n);Object.assign(e,props);if(txt)e.textContent=txt;return e}const old=document.querySelector('header');if(old)old.style.display='none';let bar=tag('div',{className:'jl-bar'}),toggle=tag('button',{type:'button','ariaLabel':'Open navigation'},'☰'),brand=tag('a',{href:base},'JL Toolkit'),search=tag('input',{className:'jl-toolbar-search',placeholder:'Search tools e.g. merge PDF, QR, contact…','ariaLabel':'Search tools'}),theme=tag('button',{type:'button'},'◐');bar.append(toggle,brand,search,theme);document.body.prepend(bar);let shade=tag('div',{className:'jl-shade'}),nav=tag('aside',{className:'jl-menu'}),close=tag('button',{type:'button'},'✕ Close'),heading=tag('h2',{},'JL Toolkit'),results=tag('div',{className:'jl-search-results'}),box=tag('div',{className:'jl-settings'});nav.append(close,heading,results,box);document.body.append(shade,nav);function render(q=''){results.replaceChildren();let value=q.toLocaleLowerCase().trim();const matched=tools.filter(x=>!value||value.split(/\s+/).every(word=>[x[0],x[2]].join(' ').toLocaleLowerCase().includes(word)));for(const t of matched)results.append(tag('a',{href:base+t[1]},t[0]));if(!matched.length)results.append(tag('p',{},'No matching tool'))}render();function open(){nav.classList.add('open');shade.classList.add('open')}function dismiss(){nav.classList.remove('open');shade.classList.remove('open')}toggle.onclick=open;close.onclick=dismiss;shade.onclick=dismiss;search.oninput=()=>{render(search.value);open()};search.onkeydown=e=>{if(e.key==='Enter'){let a=results.querySelector('a');if(a)location.href=a.href}};theme.onclick=()=>{state.dark=!state.dark;apply()};for(const [key,title] of [['dark','Dark mode'],['top','Top bar'],['menu','Menu'],['main','Main page'],['accent','Accent']]){let label=tag('label'),input=tag('input');input.type=key==='dark'?'checkbox':'color';input.checked=key==='dark'?!!state.dark:false;if(key!=='dark')input.value=state[key];input.oninput=()=>{state[key]=key==='dark'?input.checked:input.value;apply()};label.append(tag('span',{},title),input);box.append(label)}apply();document.title=document.title.replace('Personal Tools Hub','JL Toolkit');})();
+/*
+ * JL Toolkit shared shell
+ * -----------------------
+ * Responsibilities:
+ *   - Persistent light/dark theme and color customization
+ *   - Searchable tool registry
+ *   - Responsive hamburger menu and homepage links
+ *
+ * Each toolkit's business logic is maintained in /tools/<name>/app.js.
+ */
+(() => {
+  'use strict';
+
+  const scriptUrl = new URL(document.currentScript.src);
+  const base = scriptUrl.href.replace(/assets\/jl-shell\.js(?:\?.*)?$/, '');
+  const root = document.documentElement;
+
+  // Search keywords include alternate terminology used in everyday workflows.
+  const tools = [
+    { name: 'QR & Barcode Generator', path: 'tools/qr-barcode/', keywords: 'qr barcode link url code128 batch 條碼 二維碼' },
+    { name: 'PDF Toolkit', path: 'tools/pdf-toolkit/', keywords: 'pdf merge split reorder watermark word excel ppt markdown 合併 浮水印' },
+    { name: 'Image Toolkit', path: 'tools/image-toolkit/', keywords: 'image photo jpg png webp avif bmp ico conversion resize compression 圖片' },
+    { name: 'Label Designer', path: 'tools/label-designer/', keywords: 'label print barcode qr printer dpi page size stickers 標籤' },
+    { name: 'CSV to vCard', path: 'tools/csv-vcard/', keywords: 'csv contact phone vcf iphone address book import export 聯絡人 通訊錄' }
+  ];
+
+  const palettes = {
+    light: { top: '#14213b', menu: '#1d2d48', main: '#f4f6fb', accent: '#4a5ed5' },
+    dark: { top: '#080e1d', menu: '#111c32', main: '#101827', accent: '#8198ff' }
+  };
+
+  let settings = {};
+  try { settings = JSON.parse(localStorage.getItem('jl-theme') || '{}'); } catch (_) {}
+  let dark = !!settings.dark;
+  let colors = settings.colors || { light: { ...palettes.light }, dark: { ...palettes.dark } };
+
+  // Migrate preferences saved by the first version of JL Toolkit.
+  if (!settings.colors) {
+    const saved = ['top', 'menu', 'main', 'accent'].filter(k => settings[k]);
+    if (saved.length) for (const key of saved) colors.light[key] = settings[key];
+  }
+  for (const mode of ['light', 'dark']) {
+    colors[mode] = { ...palettes[mode], ...(colors[mode] || {}) };
+  }
+
+  function saveSettings() {
+    try { localStorage.setItem('jl-theme', JSON.stringify({ dark, colors })); } catch (_) {}
+  }
+
+  function applyTheme() {
+    document.body.classList.toggle('jl-dark', dark);
+    const active = colors[dark ? 'dark' : 'light'];
+    for (const [key, color] of Object.entries(active)) {
+      root.style.setProperty('--jl-' + key, color);
+    }
+    saveSettings();
+  }
+
+  function node(tag, attrs = {}, text = '') {
+    const element = document.createElement(tag);
+    Object.assign(element, attrs);
+    if (text) element.textContent = text;
+    return element;
+  }
+
+  // Replace the legacy per-page header with a single navigation component.
+  const legacyHeader = document.querySelector('header');
+  if (legacyHeader) legacyHeader.style.display = 'none';
+
+  const bar = node('div', { className: 'jl-bar' });
+  const menuButton = node('button', { type: 'button', ariaLabel: 'Open tool navigation' }, '☰');
+  const brand = node('a', { href: base }, 'JL Toolkit');
+  const search = node('input', {
+    className: 'jl-toolbar-search',
+    placeholder: 'Search tools…',
+    ariaLabel: 'Search JL Toolkit'
+  });
+  const themeButton = node('button', { type: 'button', ariaLabel: 'Toggle dark mode' }, '◐');
+  bar.append(menuButton, brand, search, themeButton);
+  document.body.prepend(bar);
+
+  const backdrop = node('div', { className: 'jl-shade' });
+  const drawer = node('aside', { className: 'jl-menu' });
+  drawer.setAttribute('aria-label', 'Tool navigation and appearance');
+  const closeButton = node('button', { type: 'button' }, '✕ Close');
+  const navLinks = node('nav', { className: 'jl-search-results' });
+  const appearance = node('div', { className: 'jl-settings' });
+  drawer.append(closeButton, node('h2', {}, 'Tools'), navLinks, node('h3', {}, 'Appearance'), appearance);
+  document.body.append(backdrop, drawer);
+
+  function renderSearch(query = '') {
+    navLinks.replaceChildren();
+    const words = query.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
+    const matches = tools.filter(tool =>
+      words.every(word => (tool.name + ' ' + tool.keywords).toLocaleLowerCase().includes(word))
+    );
+    for (const tool of matches) navLinks.append(node('a', { href: base + tool.path }, tool.name));
+    if (!matches.length) navLinks.append(node('p', {}, 'No tools match that search.'));
+  }
+
+  function openMenu() {
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+    menuButton.setAttribute('aria-expanded', 'true');
+  }
+  function closeMenu() {
+    drawer.classList.remove('open');
+    backdrop.classList.remove('open');
+    menuButton.setAttribute('aria-expanded', 'false');
+  }
+  menuButton.onclick = openMenu;
+  closeButton.onclick = closeMenu;
+  backdrop.onclick = closeMenu;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  search.oninput = () => { renderSearch(search.value); openMenu(); };
+  search.onkeydown = e => {
+    if (e.key === 'Enter') {
+      const link = navLinks.querySelector('a');
+      if (link) location.href = link.href;
+    }
+  };
+
+  function renderAppearance() {
+    appearance.replaceChildren();
+    const toggleLabel = node('label');
+    const darkInput = node('input');
+    darkInput.type = 'checkbox';
+    darkInput.checked = dark;
+    darkInput.onchange = () => { dark = darkInput.checked; applyTheme(); renderAppearance(); };
+    toggleLabel.append(node('span', {}, 'Dark mode'), darkInput);
+    appearance.append(toggleLabel);
+
+    for (const [key, label] of [
+      ['top', 'Top bar'], ['menu', 'Menu'], ['main', 'Main page'], ['accent', 'Accent']
+    ]) {
+      const row = node('label'), picker = node('input');
+      picker.type = 'color';
+      picker.value = colors[dark ? 'dark' : 'light'][key];
+      picker.oninput = () => {
+        colors[dark ? 'dark' : 'light'][key] = picker.value;
+        applyTheme();
+      };
+      row.append(node('span', {}, label), picker);
+      appearance.append(row);
+    }
+  }
+
+  themeButton.onclick = () => { dark = !dark; applyTheme(); renderAppearance(); };
+  renderSearch();
+  renderAppearance();
+  applyTheme();
+})();
