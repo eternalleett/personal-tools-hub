@@ -40,4 +40,4 @@ async function travel(step){let next=index+step;if(busy||next<0||next>=history.l
 ws('wsUndo').onclick=()=>travel(-1);ws('wsRedo').onclick=()=>travel(1);
 ws('wsDownload').onclick=()=>{if(documentBytes)save(new Blob([documentBytes],{type:'application/pdf'}),'pdf-workspace-final.pdf')};controls();
 })();
-</script></html>
+</script><script src="../../assets/jl-shell.js"></script></html>
