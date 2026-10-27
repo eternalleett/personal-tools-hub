@@ -60,3 +60,33 @@ body.jl-dark .pair,.jl-dark .pic,.jl-dark .jl-canvas{background:var(--jl-surface
 }
 @media(max-width:1049px){body.jl-tool-page .jl-controls{max-height:none;overflow:visible}}
 @media(max-width:650px){.jl-bar .jl-toolbar-search{font-size:12px}.jl-tool-page .jl-canvas .preview{min-height:240px}.jl-tool-page :is(.panel,.card){margin-bottom:10px}}
+
+/* Sticky centered navigation, separate search dropdown and appearance popover */
+.jl-bar{position:sticky;top:0;z-index:110;display:grid!important;grid-template-columns:auto minmax(130px,1fr) minmax(170px,420px) minmax(90px,1fr);gap:12px;align-items:center;min-height:66px;box-sizing:border-box}
+.jl-brand{font-weight:900;font-size:clamp(21px,2vw,29px);letter-spacing:-.065em;white-space:nowrap}
+.jl-bar-center{grid-column:3;position:relative;min-width:0;width:100%}
+.jl-toolbar-search{width:100%!important;max-width:none!important;box-sizing:border-box}
+.jl-bar-actions{grid-column:4;display:flex;gap:8px;justify-content:flex-end}
+.jl-suggestions{display:none;position:absolute;z-index:140;top:calc(100% + 7px);left:0;right:0;max-height:min(350px,55vh);overflow:auto;background:var(--jl-surface);border:1px solid var(--jl-line);border-radius:12px;box-shadow:0 12px 30px #0003;padding:7px;color:var(--jl-ink)}
+.jl-suggestions.open{display:block}.jl-suggestions a{display:block;padding:10px;color:var(--jl-ink)!important;text-decoration:none!important;border-radius:8px}.jl-suggestions a:hover{background:var(--jl-main)}
+.jl-theme-popover{position:fixed;top:72px;right:12px;z-index:135;width:min(290px,calc(100vw - 24px));background:var(--jl-menu);box-shadow:0 15px 40px #0005}
+.jl-theme-popover[hidden]{display:none!important}
+.jl-theme-popover label{color:white!important}
+.jl-bar+main,.jl-bar+.page,.jl-bar+.wrap{scroll-margin-top:75px}
+.jl-tool-page .card,.jl-tool-page .panel{max-width:100%;overflow-wrap:anywhere}
+.jl-tool-page input[type=file]{display:block;box-sizing:border-box;width:100%!important;max-width:100%;min-width:0;overflow:hidden;white-space:normal;line-height:1.6}
+.jl-tool-page input[type=file]::file-selector-button{background:var(--jl-accent);border:0;border-radius:8px;color:white;padding:9px 10px;margin-right:10px;cursor:pointer}
+.jl-tool-page .options,.jl-tool-page .row{min-width:0;flex-wrap:wrap}
+.jl-tool-page .jl-controls :is(input,select,textarea){max-width:100%;box-sizing:border-box}
+body,main,.page,.wrap{min-width:0}
+@media(max-width:760px){
+.jl-bar{grid-template-columns:auto minmax(0,1fr) auto;gap:8px;padding:9px 10px;min-height:58px}
+.jl-brand{grid-column:2;font-size:clamp(18px,5vw,23px)}
+.jl-bar-center{grid-column:1/-1;grid-row:2;max-width:100%}
+.jl-bar-actions{grid-column:3;grid-row:1}
+.jl-bar-actions button{padding:5px 8px;font-size:17px}
+.jl-menu{max-width:88vw}.jl-theme-popover{top:63px}
+.jl-tool-page .layout,.jl-tool-page .grid,.jl-tool-page main{max-width:100%}
+.jl-tool-page :is(.jl-canvas,.jl-controls){min-width:0}
+}
+@media(max-width:370px){.jl-bar{gap:5px}.jl-brand{font-size:18px}.jl-bar-actions{gap:4px}}
