@@ -97,3 +97,14 @@ html.jl-dark body{background:var(--jl-main)!important;color:var(--jl-ink)!import
 html.jl-dark body :is(.card,.panel){background:var(--jl-surface)!important;color:var(--jl-ink)!important}
 html.jl-dark body a:not(.jl-bar a):not(.jl-menu a){color:var(--jl-link)!important}
 @media(max-width:760px){.jl-bar{grid-template-columns:36px minmax(0,1fr) auto!important}.jl-bar-center{grid-column:1/-1!important;grid-row:2!important}.jl-bar-actions{grid-column:3!important;grid-row:1!important}}
+
+/* Brand-centered desktop arrangement: menu | search | JL Toolkit | theme actions. */
+@media(min-width:761px){
+.jl-bar{grid-template-columns:44px minmax(190px,1fr) auto minmax(130px,1fr)!important}
+.jl-bar>.jl-brand{grid-column:3;grid-row:1;justify-self:center}
+.jl-bar>.jl-bar-center{grid-column:2;grid-row:1;max-width:390px;justify-self:end}
+.jl-bar>.jl-bar-actions{grid-column:4;grid-row:1}
+}
+@media(max-width:760px){
+.jl-bar>.jl-brand{grid-column:2;grid-row:1;justify-self:center}
+}
