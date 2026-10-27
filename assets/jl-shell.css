@@ -166,3 +166,8 @@ body :is(input:not([type=color]),select,textarea){color:var(--jl-ink);border-col
 .jl-gallery-delete:hover{background:#fecdd3!important}
 .jl-collection .hint{margin:3px 0;font-size:12px}
 @media(max-width:650px){.jl-gallery-card{flex-basis:133px;width:133px}.jl-gallery-preview{height:91px}.jl-collection-header{align-items:flex-start}.jl-collection-actions{width:100%}.jl-collection-actions button{flex:1}}
+
+/* Current label shown above the live editing canvas. */
+.jl-active-label{display:flex;align-items:center;gap:9px;padding:10px 13px;margin:10px 0 12px;border-radius:10px;border:1px solid var(--jl-border);background:var(--jl-main);color:var(--jl-ink);font-weight:700;font-size:13px}
+.jl-active-label::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--jl-accent);flex:none}
+.jl-gallery-card.active{box-shadow:0 0 0 2px var(--jl-accent)}
