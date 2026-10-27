@@ -1,1 +1,29 @@
 :root{--jl-top:#14213b;--jl-menu:#1d2d48;--jl-main:#f4f6fb;--jl-surface:#fff;--jl-ink:#1b2d46;--jl-accent:#4a5ed5}body.jl-dark{--jl-top:#080e1d;--jl-menu:#111c32;--jl-main:#101827;--jl-surface:#1b2940;--jl-ink:#edf3ff}body{background:var(--jl-main)!important;color:var(--jl-ink)!important}header{background:var(--jl-top)!important}.panel,.card{background:var(--jl-surface)!important;color:var(--jl-ink)!important}body.jl-dark input,body.jl-dark select,body.jl-dark textarea{background:#263650!important;color:#f4f7ff!important;border-color:#536480!important}body.jl-dark p,body.jl-dark .hint,body.jl-dark .note{color:#b1c1d8!important}.jl-bar{position:relative;z-index:100;display:flex;align-items:center;gap:12px;padding:12px 18px;background:var(--jl-top);color:white}.jl-bar a{color:white;text-decoration:none}.jl-bar button{border:1px solid #ffffff4c;background:transparent;color:white;min-height:38px;border-radius:8px;padding:7px 12px;cursor:pointer}.jl-menu{position:fixed;z-index:101;top:0;bottom:0;left:0;width:min(310px,88vw);padding:20px;background:var(--jl-menu);color:white;box-shadow:0 10px 50px #0005;overflow:auto;transform:translateX(-105%);transition:transform .18s}.jl-menu.open{transform:translateX(0)}.jl-menu a{display:block;color:white;text-decoration:none;padding:11px 9px;border-radius:9px}.jl-menu a:hover{background:#ffffff20}.jl-menu input{width:100%;padding:10px;border-radius:8px;box-sizing:border-box}.jl-shade{position:fixed;inset:0;background:#0008;z-index:100;display:none}.jl-shade.open{display:block}.jl-settings{padding:10px;border:1px solid #ffffff3f;border-radius:12px}.jl-settings label{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0;color:white}.jl-settings input[type=color]{width:55px;height:31px}.jl-search-results{margin-top:8px}.jl-toolbar-search{flex:1;max-width:420px;padding:9px;border-radius:9px;border:1px solid #c7d0dc}.jl-dark .preview{background:#293951!important}.jl-dark .card a{color:inherit!important}
+/* JL Toolkit unified workspace v2 */
+:root{--jl-line:#dce4ef;--jl-radius:16px;--jl-muted:#66758b}
+body.jl-tool-page{min-height:100vh;background:var(--jl-main)!important;color:var(--jl-ink)!important}
+.jl-tool-page :is(.page,.wrap,main){max-width:1480px}
+.jl-tool-page :is(.panel,.card){background:var(--jl-surface)!important;color:var(--jl-ink)!important;border:1px solid var(--jl-line);border-radius:var(--jl-radius);box-shadow:0 7px 24px #0919310a}
+.jl-tool-page :is(.panel,.card) h2{margin-top:0;font-size:17px;letter-spacing:-.015em}
+.jl-tool-page :is(.panel,.card) h3{font-size:14px}
+.jl-tool-page button:not(.jl-bar button):not(.jl-menu button){border-radius:9px;transition:filter .15s;background:var(--jl-accent)}
+.jl-tool-page button:hover{filter:brightness(.96)}
+.jl-tool-page button:disabled{cursor:not-allowed;opacity:.5}
+.jl-tool-page :is(input,textarea,select){accent-color:var(--jl-accent)}
+.jl-tool-page :is(.hint,.note,.muted,.summary){color:var(--jl-muted)}
+.jl-tool-page :is(.preview,#preview,#wsPreview,#stage,#previews){scrollbar-width:thin}
+.jl-tool-page :is(.preview,#preview,#wsPreview,#stage){min-width:0}
+.jl-tool-page a{color:var(--jl-accent)}
+.jl-tool-page .jl-bar a{color:white}
+.jl-dark{--jl-line:#354763;--jl-muted:#abbcd5}
+.jl-dark :is(.panel,.card){box-shadow:none}
+.jl-dark :is(#stage,.preview,#wsPreview){background:#26354b!important}
+.jl-dark :is(.itemList,.thumb,.pair){border-color:#52617b!important}
+@media(min-width:1000px){
+body.jl-tool-page .jl-controls{grid-column:1;min-width:0}
+body.jl-tool-page .jl-canvas{grid-column:2;min-width:0;align-self:start}
+body.jl-tool-page .jl-two-column{display:grid;grid-template-columns:minmax(270px,330px) minmax(0,1fr);gap:18px;align-items:start}
+body.jl-tool-page .jl-canvas .preview,body.jl-tool-page .jl-canvas #preview{min-height:370px}
+}
+@media(max-width:999px){body.jl-tool-page .jl-two-column{display:grid;grid-template-columns:1fr;gap:15px}}
+@media(max-width:600px){body.jl-tool-page :is(.panel,.card){padding:15px}body.jl-tool-page .jl-bar{gap:7px;padding:10px}body.jl-tool-page .jl-toolbar-search{min-width:0}}
