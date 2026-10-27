@@ -99,7 +99,7 @@
   document.body.append(backdrop, drawer, appearance);
 
   function matchedTools(query = '') {
-    const words = query.toLocaleLowerCase().trim().split(/\\s+/).filter(Boolean);
+    const words = query.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
     return tools.filter(tool => words.every(word =>
       (tool.name + ' ' + tool.keywords).toLocaleLowerCase().includes(word)));
   }
