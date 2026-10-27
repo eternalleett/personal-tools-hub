@@ -1,1 +1,64 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JL Toolkit | JL Toolkit</title><style>*{box-sizing:border-box}body{margin:0;font:16px system-ui;background:#f5f7fb;color:#16233d}header{background:#121e35;color:white;padding:25px max(22px,calc((100vw - 1100px)/2));font-weight:800;font-size:23px}main{max-width:1100px;margin:50px auto;padding:0 22px}h1{font-size:clamp(32px,5vw,52px);margin-bottom:5px}p{color:#64728a;line-height:1.6}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-top:35px}.card{background:white;border:1px solid #e0e6ee;border-radius:20px;padding:28px;text-decoration:none;color:inherit;box-shadow:0 10px 32px #14213b0b}.card h2{margin:10px 0}.card span{color:#465bea;font-weight:700}.soon{opacity:.6;border-style:dashed}</style><link rel="icon" href="./favicon.svg"><link rel="stylesheet" href="./assets/jl-shell.css"></head><body><header>▦ JL Toolkit</header><main><h1>Find the right tool, fast.</h1><p>Private, browser-based utilities for desktop and mobile. Built to expand with new tools over time.</p><div class="grid"><a class="card" href="./tools/qr-barcode/"><div style="font-size:38px">▦</div><h2>QR & Barcode Generator</h2><p>Custom QR and Code 128, CSV bulk generation, PNG/SVG/ZIP downloads.</p><span>Open tool →</span></a><a class="card" href="./tools/pdf-toolkit/"><div style="font-size:38px">▤</div><h2>PDF Toolkit</h2><p>Merge, extract, reorder, rotate and split PDF pages.</p><span>Open tool →</span></a><a class="card" href="./tools/image-toolkit/"><div style="font-size:38px">▧</div><h2>Image Toolkit</h2><p>Resize, compress and convert images in bulk.</p><span>Open tool →</span></a><a class="card" href="./tools/label-designer/"><div style="font-size:38px">▣</div><h2>Label Designer & Printer</h2><p>Create QR/barcode labels, export SVG/PNG and print.</p><span>Open tool →</span></a><a class="card" href="./tools/csv-vcard/"><div style="font-size:38px">▤</div><h2>CSV to iPhone vCard</h2><p>Import, preview and convert CSV contacts into .vcf files.</p><span>Open tool →</span></a><div class="card soon"><div style="font-size:38px">＋</div><h2>Future utilities</h2><p>More independent tools will be added to the hub.</p></div></div></main><script src="./assets/jl-shell.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#14213b">
+  <title>JL Toolkit — Browser utilities</title>
+  <meta name="description" content="JL Toolkit: private browser-based PDF, image, barcode, label and contact utilities.">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/jl-shell.css">
+  <style>
+  /* Homepage: editorial overview with right-hand quick-launch panel. */
+  .jl-home{max-width:1440px;margin:0 auto;padding:clamp(18px,4vw,52px);display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:clamp(18px,3vw,44px);align-items:start}
+  .jl-home h1{font-size:clamp(36px,5vw,66px);letter-spacing:-.055em;line-height:1.08;margin:4px 0 20px}
+  .jl-home p{line-height:1.75;color:var(--jl-ink);opacity:.86}
+  .jl-kicker{font-size:12px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--jl-link)}
+  .jl-intro{max-width:770px;padding:35px 0}
+  .jl-intro>p{font-size:clamp(16px,2vw,20px);max-width:680px}
+  .jl-guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:35px 0}
+  .jl-feature{padding:19px;border-radius:15px;background:var(--jl-surface);border:1px solid var(--jl-line)}
+  .jl-feature strong{display:block;margin-bottom:4px;font-size:16px}
+  .jl-feature p{font-size:13px;margin:0}
+  .jl-launcher{position:sticky;top:20px;background:var(--jl-surface);border:1px solid var(--jl-line);border-radius:18px;padding:20px;box-shadow:0 12px 42px #05132c10}
+  .jl-launcher h2{font-size:20px;margin:0 0 4px}
+  .jl-launcher>p{font-size:13px;margin:0 0 15px}
+  .jl-tool-link{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px 9px;border-radius:10px;text-decoration:none!important;color:var(--jl-ink)!important;border-bottom:1px solid var(--jl-line);font-weight:650}
+  .jl-tool-link:hover{background:var(--jl-main)}
+  .jl-tool-link span{font-size:12px;color:var(--jl-link)}
+  .jl-small{font-size:13px}
+  @media(max-width:900px){.jl-home{grid-template-columns:1fr}.jl-intro{padding:4px 0}.jl-launcher{position:static;grid-row:2}.jl-guide{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.jl-guide{grid-template-columns:1fr}.jl-home{padding:16px}}
+  </style>
+</head>
+<body>
+  <!-- Navigation, search, dark mode and theme controls are mounted by jl-shell.js. -->
+  <header><a href="./">JL Toolkit</a></header>
+  <main class="jl-home">
+    <article class="jl-intro">
+      <div class="jl-kicker">JL Toolkit • Browser utilities</div>
+      <h1>Everyday file and data tools. One place.</h1>
+      <p>Prepare documents, convert images, generate labels and QR codes, or organize contacts directly from your browser. JL Toolkit is designed for laptop and mobile workflows, with consistent navigation and focused workspaces.</p>
+      <section class="jl-guide" aria-label="Product highlights">
+        <div class="jl-feature"><strong>Flexible documents</strong><p>Merge, reorder, rotate and annotate PDF pages using a visual workspace.</p></div>
+        <div class="jl-feature"><strong>Fast data workflows</strong><p>Convert images, generate codes in bulk, and edit CSV contacts before exporting vCards.</p></div>
+        <div class="jl-feature"><strong>Reusable designs</strong><p>Build label layouts with draggable elements, editable templates and DPI previews.</p></div>
+      </section>
+      <h2>How it works</h2>
+      <p>Select a tool from Quick Launch, import your files, preview the results, and export the finished output. Most processing is performed locally in your browser. Some features use external JavaScript libraries and need network access when first loaded.</p>
+      <h2>Built to expand</h2>
+      <p>Each utility has its own module and an independent web address, while sharing the JL Toolkit navigation and visual theme. New functions can be added without disrupting the existing tools.</p>
+    </article>
+    <aside class="jl-launcher" aria-label="Toolkit quick launch">
+      <h2>Quick Launch</h2><p>Open a tool directly, or use the search in the top bar.</p>
+      <a class="jl-tool-link" href="./tools/qr-barcode/">QR & Barcode Generator <span>Open ↗</span></a>
+      <a class="jl-tool-link" href="./tools/pdf-toolkit/">PDF Toolkit <span>Open ↗</span></a>
+      <a class="jl-tool-link" href="./tools/image-toolkit/">Image Toolkit <span>Open ↗</span></a>
+      <a class="jl-tool-link" href="./tools/label-designer/">Label Designer <span>Open ↗</span></a>
+      <a class="jl-tool-link" href="./tools/csv-vcard/">CSV to vCard <span>Open ↗</span></a>
+      <p class="jl-small">New tools will appear here as the hub expands.</p>
+    </aside>
+  </main>
+  <script src="./assets/jl-shell.js"></script>
+</body>
+</html>
