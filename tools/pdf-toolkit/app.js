@@ -37,3 +37,20 @@ async function travel(step){let next=index+step;if(busy||next<0||next>=history.l
 ws('wsUndo').onclick=()=>travel(-1);ws('wsRedo').onclick=()=>travel(1);
 ws('wsDownload').onclick=()=>{if(documentBytes)save(new Blob([documentBytes],{type:'application/pdf'}),'pdf-workspace-final.pdf')};controls();
 })();
+
+/* Workspace mode tabs: preserve each mode's state while switching panels. */
+(function setupPdfModes(){
+  const workspace = document.getElementById('workspace');
+  const classic = document.getElementById('pdfClassic');
+  const one = document.getElementById('showWorkspace');
+  const two = document.getElementById('showClassic');
+  function show(mode){
+    workspace.hidden = mode !== 'workspace';
+    classic.hidden = mode !== 'classic';
+    one.setAttribute('aria-pressed', String(mode === 'workspace'));
+    two.setAttribute('aria-pressed', String(mode === 'classic'));
+  }
+  one.addEventListener('click', () => show('workspace'));
+  two.addEventListener('click', () => show('classic'));
+  show('workspace');
+})();
