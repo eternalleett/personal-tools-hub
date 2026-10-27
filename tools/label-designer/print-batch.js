@@ -7,7 +7,9 @@
  controls.append(saveBtn,updateBtn);
  const list=document.createElement('div');list.className='jl-label-library';
  const note=document.createElement('p');note.className='hint';
- panel.prepend(controls,list,note);
+ const manager=document.querySelector('.controls')||panel;
+ const title=document.createElement('h3');title.textContent='Saved labels';
+ manager.append(title,controls,list,note);
  let records=[],active=-1;
  const snap=()=>({layout:JSON.parse(JSON.stringify(model)),svg:renderedSvg(),name:model.name||'Untitled Label'});
  function repaint(){
@@ -19,7 +21,7 @@
      if(svg.nodeName.toLowerCase()==='svg')preview.append(document.importNode(svg,true));
      const content=document.createElement('div');const name=document.createElement('strong');name.textContent=record.name||'Untitled Label';
      const actions=document.createElement('div');actions.className='bar';
-     const edit=document.createElement('button');edit.textContent='Edit';edit.className='alt';edit.onclick=()=>{active=i;load(JSON.parse(JSON.stringify(records[i].layout)));repaint()};
+     const edit=document.createElement('button');edit.textContent='Edit';edit.className='alt';edit.onclick=()=>{active=i;load(JSON.parse(JSON.stringify(records[i].layout)));document.querySelector('.jl-view-tabs [data-view="editor"]')?.click();repaint()};
      const del=document.createElement('button');del.textContent='Delete';del.className='warn';del.onclick=()=>{records.splice(i,1);if(active===i)active=-1;else if(active>i)active--;repaint()};
      actions.append(edit,del);content.append(name,actions);card.append(preview,content);list.append(card);
    });
