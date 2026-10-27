@@ -32,6 +32,7 @@
   let settings = {};
   try { settings = JSON.parse(localStorage.getItem('jl-theme') || '{}'); } catch (_) {}
   let dark = !!settings.dark;
+  let fontChoice = settings.font || 'system';
   let colors = settings.colors || { light: { ...palettes.light }, dark: { ...palettes.dark } };
 
   // Migrate preferences saved by the first version of JL Toolkit.
@@ -44,7 +45,7 @@
   }
 
   function saveSettings() {
-    try { localStorage.setItem('jl-theme', JSON.stringify({ dark, colors })); } catch (_) {}
+    try { localStorage.setItem('jl-theme', JSON.stringify({ dark, colors, font: fontChoice })); } catch (_) {}
   }
 
   function applyTheme() {
@@ -55,6 +56,14 @@
     for (const [key, color] of Object.entries(active)) {
       root.style.setProperty('--jl-' + key, color);
     }
+    const fonts = {
+      system: 'system-ui,-apple-system,"Segoe UI",sans-serif',
+      nunito: '"Nunito",system-ui,sans-serif',
+      quicksand: '"Quicksand",system-ui,sans-serif',
+      rubik: '"Rubik",system-ui,sans-serif',
+      atkinson: '"Atkinson Hyperlegible",system-ui,sans-serif'
+    };
+    root.style.setProperty('--jl-font',fonts[fontChoice]||fonts.system);
     saveSettings();
   }
 
@@ -177,6 +186,18 @@
       row.append(node('span', {}, label), picker);
       appearance.append(row);
     }
+    const row = node('label');
+    const selector = node('select');
+    selector.setAttribute('aria-label','Website font');
+    for (const [value, label] of [
+      ['system','System (default)'],['nunito','Nunito — rounded'],
+      ['quicksand','Quicksand — soft rounded'],['rubik','Rubik — modern rounded'],
+      ['atkinson','Atkinson — readable']
+    ]) selector.add(new Option(label,value));
+    selector.value = fontChoice;
+    selector.onchange = () => { fontChoice=selector.value; applyTheme(); };
+    row.append(node('span',{},'Website font'),selector);
+    appearance.append(row);
   }
 
   themeButton.onclick = () => { dark = !dark; applyTheme(); renderAppearance(); };
