@@ -16,3 +16,21 @@ $('export').onclick=async()=>{let m=mapping(),button=$('export'),valid=0,skipped
 function downloadEditedCSV(){if(!headers.length)return;let quote=v=>{let str=String(v??'');return /[",\r\n]/.test(str)?'"'+str.replace(/"/g,'""')+'"':str};let csv='\uFEFF'+[headers,...rows].map(row=>row.map(quote).join(',')).join('\r\n'),u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=u;a.download='edited-contacts.csv';a.click();setTimeout(()=>URL.revokeObjectURL(u),5000)}
 $('exportCSV').onclick=downloadEditedCSV;
 $('addRow').onclick=()=>{if(!headers.length){$('status').textContent='Import a CSV first';return}rows.unshift(Array(headers.length).fill(''));$('page').value='0';preview();$('status').textContent='Blank contact added. Edit the first row.'};
+
+/* Initial empty template: users can enter contacts without importing a CSV. */
+(function initializeBlankContacts() {
+  if (headers.length) return;
+  headers = ['First Name','Last Name','Full Name','Mobile','Email','Company','Job Title','Notes'];
+  rows = [Array(headers.length).fill('')];
+  for (const field of fields) {
+    const select = $(field);
+    select.replaceChildren(new Option('— Not mapped —',''));
+    headers.forEach((header,index) => select.add(new Option(header,String(index))));
+    const normalized=headers.map(h=>h.toLowerCase().trim());
+    const found=matches[field].map(word=>normalized.indexOf(word)).find(i=>i>=0);
+    select.value=found===undefined?'':String(found);
+    select.onchange=preview;
+  }
+  preview();
+  $('status').textContent='Blank contact template ready. Click a cell to edit or import your own CSV.';
+})();
