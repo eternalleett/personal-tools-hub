@@ -14,7 +14,34 @@ function point(ev){let p=$('design').createSVGPoint();p.x=ev.clientX;p.y=ev.clie
 $('design').addEventListener('pointerdown',e=>{let g=e.target.closest('.item');if(!g)return;select(g.dataset.id);let a=item(),p=point(e);drag={id:a.id,x:a.x,y:a.y,startX:p.x,startY:p.y};$('design').setPointerCapture(e.pointerId);e.preventDefault()});$('design').addEventListener('pointermove',e=>{if(!drag)return;let a=item();if(!a||a.id!==drag.id)return;let p=point(e);a.x=Math.round((drag.x+(p.x-drag.startX)/4)*10)/10;a.y=Math.round((drag.y+(p.y-drag.startY)/4)*10)/10;$('x').value=a.x;$('y').value=a.y;draw()});$('design').addEventListener('pointerup',()=>{drag=null;refresh()});$('design').addEventListener('pointercancel',()=>{drag=null;refresh()});document.addEventListener('keydown',e=>{let a=item();if(!a||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||/input|textarea|select/i.test(document.activeElement.tagName))return;let delta=e.shiftKey?2:.5;if(e.key==='ArrowLeft')a.x-=delta;if(e.key==='ArrowRight')a.x+=delta;if(e.key==='ArrowUp')a.y-=delta;if(e.key==='ArrowDown')a.y+=delta;e.preventDefault();select(a.id)});
 $('addText').onclick=()=>add('text');$('addQr').onclick=()=>add('qr');$('addBarcode').onclick=()=>add('barcode');for(let k of ['x','y','w','h','content','color','fontSize','fontFamily','bold','italic','align','rotate'])$(k).addEventListener('input',valueChange);for(let k of ['labelW','labelH','name'])$(k).addEventListener('change',config);
 $('remove').onclick=()=>{model.elements=model.elements.filter(a=>a.id!==selected);select(null)};function shift(n){let i=model.elements.findIndex(a=>a.id===selected),j=i+n;if(i<0||j<0||j>=model.elements.length)return;[model.elements[i],model.elements[j]]=[model.elements[j],model.elements[i]];refresh()}$('up').onclick=()=>shift(1);$('down').onclick=()=>shift(-1);
-function valid(m){if(!m||!Array.isArray(m.elements)||!Number.isFinite(Number(m.width))||!Number.isFinite(Number(m.height))||Number(m.width)<20||Number(m.height)<15||Number(m.width)>300||Number(m.height)>300||m.elements.length>500)throw Error('Invalid layout dimensions or elements');let els=m.elements.map(e=>{if(!['text','qr','barcode'].includes(e.type))throw Error('Unknown element type');return{...e,id:uid(),x:Number(e.x)||0,y:Number(e.y)||0,w:Math.max(1,Number(e.w)||10),h:Math.max(1,Number(e.h)||10),text:String(e.text||''),value:String(e.value||''),color:/^#[0-9a-fA-F]{6}$/.test(e.color)?e.color:'#111111',fontSize:Number(e.fontSize)||4}});return{version:1,name:String(m.name||'Imported layout'),width:Number(m.width),height:Number(m.height),elements:els}}function load(m){model=valid(m);$('name').value=model.name;$('labelW').value=model.width;$('labelH').value=model.height;select(null);setMsg('Editable layout loaded: '+model.elements.length+' elements')}
+function valid(m){if(!m||!Array.isArray(m.elements)||!Number.isFinite(Number(m.width))||!Number.isFinite(Number(m.height))||Number(m.width)<20||Number(m.height)<15||Number(m.width)>300||Number(m.height)>300||m.elements.length>500)throw Error('Invalid layout dimensions or elements');let els=m.elements.map(e=>{if(!['text','qr','barcode'].includes(e.type))throw Error('Unknown element type');return{...e,id:uid(),x:Number(e.x)||0,y:Number(e.y)||0,w:Math.max(1,Number(e.w)||10),h:Math.max(1,Number(e.h)||10),text:String(e.text||''),value:String(e.value||''),color:/^#[0-9a-fA-F]{6}$/.test(e.color)?e.color:'#111111',fontSize:Number(e.fontSize)||4}});return{version:1,name:String(m.name||'Imported layout'),width:Number(m.width),height:Number(m.height),elements:els}}function load(m){
+ // A label switch is a document boundary: cancel pending history commits from
+ // the previously active label before replacing the editor model.
+ if(typeof historyTimer!=='undefined')clearTimeout(historyTimer);
+ model=valid(m);
+ selected=null;
+ $('name').value=model.name;
+ $('labelW').value=model.width;
+ $('labelH').value=model.height;
+ select(null);
+ if(typeof timeline!=='undefined'){
+   timeline=[JSON.stringify(model)];
+   cursor=0;
+   historyButtons();
+ }
+ setMsg('Loaded '+model.name+' ('+model.elements.length+' elements)');
+ return model;
+}
+// Public document-level selection API. All gallery navigation uses this single
+// loading path rather than creating a preview-only selection state.
+window.JLLabelEditor={
+ loadLayout(layout){
+   const loaded=load(JSON.parse(JSON.stringify(layout)));
+   draw();
+   return loaded;
+ },
+ currentLayout(){return JSON.parse(JSON.stringify(model))}
+};
 function save(b,n){let u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000)}$('saveLayout').onclick=()=>{config();save(new Blob([JSON.stringify(model,null,2)],{type:'application/json'}),(model.name.replace(/[^a-z0-9_-]+/gi,'-')||'label')+'.json')};$('file').onchange=async e=>{try{let f=e.target.files[0];if(f)load(JSON.parse(await f.text()))}catch(err){setMsg('Import failed: '+err.message)}};
 $('preset').onclick=()=>{try{if(!window.JL_HOSPITAL_PRESET)throw Error('Sample script was not loaded');load(clone(window.JL_HOSPITAL_PRESET));setMsg('Hospital label example loaded. QR and barcode values are placeholders.')}catch(e){setMsg('Import failed: '+e.message)}};$('reset').onclick=()=>load({version:1,name:'Untitled Label',width:100,height:60,elements:[]});
 function renderedSvg(){const svg=$('design').cloneNode(true);svg.querySelectorAll('.outline,.hit').forEach(x=>x.remove());svg.querySelectorAll('.item').forEach(x=>x.removeAttribute('class'));svg.setAttribute('xmlns',NS);return new XMLSerializer().serializeToString(svg)}$('svg').onclick=()=>save(new Blob([renderedSvg()],{type:'image/svg+xml'}),'label.svg');$('png').onclick=()=>{let xml=renderedSvg(),u=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'})),im=new Image;im.onload=()=>{let c=document.createElement('canvas');c.width=Math.round(model.width/25.4*300);c.height=Math.round(model.height/25.4*300);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?save(b,'label-300dpi.png'):setMsg('PNG conversion failed'))};im.onerror=()=>{URL.revokeObjectURL(u);setMsg('PNG rendering failed')};im.src=u};$('print').onclick=()=>window.print();
