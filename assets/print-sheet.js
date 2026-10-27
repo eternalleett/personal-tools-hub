@@ -27,7 +27,8 @@ window.JLPrintSheet = (() => {
   }
   async function generate() {
     const items=getItems();if(!items.length)throw Error('Add a code or label first');
-    const o=config(),widthPx=Math.round(o.width*3),heightPx=Math.round(o.height*3);
+    const o=config(),dpi=300,pxPerMm=dpi/25.4;
+    const widthPx=Math.round(o.width*pxPerMm),heightPx=Math.round(o.height*pxPerMm);
     const cellW=(o.width-2*o.margin)/o.cols,cellH=(o.height-2*o.margin)/o.rows;
     if(cellW<=0||cellH<=0)throw Error('Margin is larger than paper');
     let pages=[];
@@ -36,9 +37,9 @@ window.JLPrintSheet = (() => {
       const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,widthPx,heightPx);
       for(let i=0;i<o.cols*o.rows&&offset+i<items.length;i++){
         const item=items[offset+i],src=await raster(item.svg);
-        const c=i%o.cols,r=Math.floor(i/o.cols),scale=Math.min(cellW*3/src.width,cellH*3/src.height)*.92;
-        const x=(o.margin+c*cellW)*3+(cellW*3-src.width*scale)/2;
-        const y=(o.margin+r*cellH)*3+(cellH*3-src.height*scale)/2;
+        const c=i%o.cols,r=Math.floor(i/o.cols),scale=Math.min(cellW*pxPerMm/src.width,cellH*pxPerMm/src.height)*.92;
+        const x=(o.margin+c*cellW)*pxPerMm+(cellW*pxPerMm-src.width*scale)/2;
+        const y=(o.margin+r*cellH)*pxPerMm+(cellH*pxPerMm-src.height*scale)/2;
         ctx.drawImage(src,x,y,src.width*scale,src.height*scale);
       }
       pages.push(canvas);
