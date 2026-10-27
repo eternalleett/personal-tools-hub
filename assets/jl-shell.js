@@ -163,8 +163,28 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeMenu(); appearance.hidden = true; suggestions.classList.remove('open'); }
   });
+  // Full palettes include readable typography, surfaces, borders, and controls.
+  const themePresets = {
+    original: { top:'#14213b',menu:'#1d2d48',main:'#f4f6fb',surface:'#ffffff',ink:'#1b2d46',muted:'#64748b',border:'#dce4ef',accent:'#4a5ed5',link:'#2752c4' },
+    reference: { top:'#182b36',menu:'#223c46',main:'#eff3ed',surface:'#ffffff',ink:'#223c41',muted:'#526c70',border:'#cbd8cf',accent:'#538b81',link:'#276a68' },
+    midnight: { top:'#0d1424',menu:'#17233b',main:'#101827',surface:'#202d43',ink:'#edf4ff',muted:'#b0c4db',border:'#394c69',accent:'#8ca8ff',link:'#b9dcff' },
+    lavender: { top:'#2c2345',menu:'#3b3157',main:'#f6f2fc',surface:'#ffffff',ink:'#332c45',muted:'#6e6382',border:'#e0d8ed',accent:'#8067ba',link:'#6a50ab' }
+  };
+  function applyPreset(name) {
+    const palette=themePresets[name];
+    if (!palette) return;
+    colors[dark?'dark':'light']={...colors[dark?'dark':'light'],...palette};
+    applyTheme();renderAppearance();
+  }
   function renderAppearance() {
     appearance.replaceChildren();
+    const presetsRow=node('label');
+    const presetSelect=node('select');
+    presetSelect.setAttribute('aria-label','Complete website color palette');
+    for(const [value,title] of [['','Choose palette…'],['original','Original blue'],['reference','Reference palette · natural teal'],['midnight','Midnight'],['lavender','Soft lavender']])presetSelect.add(new Option(title,value));
+    presetSelect.onchange=()=>{if(presetSelect.value)applyPreset(presetSelect.value)};
+    presetsRow.append(node('span',{},'Color palette'),presetSelect);
+    appearance.append(presetsRow);
     const toggleLabel = node('label');
     const darkInput = node('input');
     darkInput.type = 'checkbox';
@@ -174,7 +194,7 @@
     appearance.append(toggleLabel);
 
     for (const [key, label] of [
-      ['top', 'Top bar'], ['menu', 'Menu'], ['main', 'Main page'], ['accent', 'Accent']
+      ['top', 'Top bar'], ['menu', 'Menu'], ['main', 'Main page'], ['surface', 'Cards'], ['ink', 'Main text'], ['muted', 'Secondary text'], ['border', 'Borders'], ['accent', 'Buttons'], ['link', 'Links']
     ]) {
       const row = node('label'), picker = node('input');
       picker.type = 'color';
