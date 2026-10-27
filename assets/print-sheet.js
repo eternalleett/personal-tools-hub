@@ -67,8 +67,20 @@ window.JLPrintSheet = (() => {
     getItems=provider;
     $('jlPreviewSheet').onclick=async()=>{try{$('jlSheetInfo').textContent='Preparing print preview…';await generate()}catch(e){$('jlSheetInfo').textContent=e.message}};
     $('jlExportSheet').onclick=async()=>{try{$('jlSheetInfo').textContent='Preparing PDF…';await generate();await downloadPdf();$('jlSheetInfo').textContent+=' • PDF exported'}catch(e){$('jlSheetInfo').textContent=e.message}};
-    $('jlPaper').onchange=()=>{$('jlCustomPaper').hidden=$('jlPaper').value!=='custom';lastPages=[]};
-    for(const id of ['jlCols','jlRows','jlMargin','jlPaperW','jlPaperH'])$(id).onchange=()=>lastPages=[];
+    let refreshTimer=null;
+    const refreshVisible=()=>{
+      lastPages=[];
+      clearTimeout(refreshTimer);
+      const panel=$('jlPaper').closest('.jl-sheet-tab');
+      if(!panel || panel.hidden)return;
+      refreshTimer=setTimeout(async()=>{
+        try{await generate()}catch(e){$('jlSheetInfo').textContent=e.message}
+      },180);
+    };
+    $('jlPaper').onchange=()=>{$('jlCustomPaper').hidden=$('jlPaper').value!=='custom';refreshVisible()};
+    for(const id of ['jlCols','jlRows','jlMargin','jlPaperW','jlPaperH'])$(id).addEventListener('input',refreshVisible);
+    document.addEventListener('jl:sheet-open',refreshVisible);
+    document.addEventListener('jl:label-changed',refreshVisible);
   }
   return {init};
 })();
