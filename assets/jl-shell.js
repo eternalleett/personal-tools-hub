@@ -67,59 +67,91 @@
   const legacyHeader = document.querySelector('header');
   if (legacyHeader) legacyHeader.style.display = 'none';
 
+
+  // Sticky, responsive header. Search results never open the navigation drawer.
   const bar = node('div', { className: 'jl-bar' });
-  const menuButton = node('button', { type: 'button', ariaLabel: 'Open tool navigation' }, '☰');
-  const brand = node('a', { href: base }, 'JL Toolkit');
+  const menuButton = node('button', { type: 'button', ariaLabel: 'Open navigation' }, '☰');
+  const brand = node('a', { href: base, className: 'jl-brand' }, 'JL Toolkit');
+  const center = node('div', { className: 'jl-bar-center' });
   const search = node('input', {
-    className: 'jl-toolbar-search',
-    placeholder: 'Search tools…',
-    ariaLabel: 'Search JL Toolkit'
+    className: 'jl-toolbar-search', placeholder: 'Search tools…',
+    ariaLabel: 'Search JL Toolkit', autocomplete: 'off'
   });
+  const suggestions = node('div', { className: 'jl-suggestions', role: 'listbox' });
+  center.append(search, suggestions);
+  const actions = node('div', { className: 'jl-bar-actions' });
   const themeButton = node('button', { type: 'button', ariaLabel: 'Toggle dark mode' }, '◐');
-  bar.append(menuButton, brand, search, themeButton);
+  const customizeButton = node('button', { type: 'button', ariaLabel: 'Customize theme colors' }, '⚙');
+  actions.append(themeButton, customizeButton);
+  bar.append(menuButton, brand, center, actions);
   document.body.prepend(bar);
 
   const backdrop = node('div', { className: 'jl-shade' });
   const drawer = node('aside', { className: 'jl-menu' });
-  drawer.setAttribute('aria-label', 'Tool navigation and appearance');
+  drawer.setAttribute('aria-label', 'Tool navigation');
   const closeButton = node('button', { type: 'button' }, '✕ Close');
   const navLinks = node('nav', { className: 'jl-search-results' });
-  const appearance = node('div', { className: 'jl-settings' });
-  drawer.append(closeButton, node('h2', {}, 'Tools'), navLinks, node('h3', {}, 'Appearance'), appearance);
-  document.body.append(backdrop, drawer);
+  drawer.append(closeButton, node('h2', {}, 'Tools'), navLinks);
+  const appearance = node('div', { className: 'jl-settings jl-theme-popover' });
+  appearance.hidden = true;
+  document.body.append(backdrop, drawer, appearance);
 
+  function matchedTools(query = '') {
+    const words = query.toLocaleLowerCase().trim().split(/\\s+/).filter(Boolean);
+    return tools.filter(tool => words.every(word =>
+      (tool.name + ' ' + tool.keywords).toLocaleLowerCase().includes(word)));
+  }
   function renderSearch(query = '') {
     navLinks.replaceChildren();
-    const words = query.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
-    const matches = tools.filter(tool =>
-      words.every(word => (tool.name + ' ' + tool.keywords).toLocaleLowerCase().includes(word))
-    );
-    for (const tool of matches) navLinks.append(node('a', { href: base + tool.path }, tool.name));
-    if (!matches.length) navLinks.append(node('p', {}, 'No tools match that search.'));
+    for (const tool of matchedTools(query)) {
+      navLinks.append(node('a', { href: base + tool.path }, tool.name));
+    }
   }
-
+  function renderSuggestions() {
+    suggestions.replaceChildren();
+    const query = search.value.trim();
+    if (!query) { suggestions.classList.remove('open'); return; }
+    const matched = matchedTools(query);
+    for (const tool of matched) suggestions.append(node('a', {
+      href: base + tool.path, role: 'option'
+    }, tool.name));
+    if (!matched.length) suggestions.append(node('p', {}, 'No matching tools'));
+    suggestions.classList.add('open');
+  }
   function openMenu() {
-    drawer.classList.add('open');
-    backdrop.classList.add('open');
+    drawer.classList.add('open'); backdrop.classList.add('open');
     menuButton.setAttribute('aria-expanded', 'true');
+    suggestions.classList.remove('open');
+    appearance.hidden = true;
   }
   function closeMenu() {
-    drawer.classList.remove('open');
-    backdrop.classList.remove('open');
+    drawer.classList.remove('open'); backdrop.classList.remove('open');
     menuButton.setAttribute('aria-expanded', 'false');
   }
   menuButton.onclick = openMenu;
   closeButton.onclick = closeMenu;
   backdrop.onclick = closeMenu;
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
-  search.oninput = () => { renderSearch(search.value); openMenu(); };
+  search.oninput = renderSuggestions;
+  search.onfocus = renderSuggestions;
   search.onkeydown = e => {
     if (e.key === 'Enter') {
-      const link = navLinks.querySelector('a');
+      const link = suggestions.querySelector('a');
       if (link) location.href = link.href;
     }
+    if (e.key === 'Escape') suggestions.classList.remove('open');
   };
-
+  customizeButton.onclick = () => {
+    appearance.hidden = !appearance.hidden;
+    suggestions.classList.remove('open');
+    closeMenu();
+  };
+  document.addEventListener('pointerdown', e => {
+    if (!center.contains(e.target)) suggestions.classList.remove('open');
+    if (!appearance.contains(e.target) && !customizeButton.contains(e.target)) appearance.hidden = true;
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeMenu(); appearance.hidden = true; suggestions.classList.remove('open'); }
+  });
   function renderAppearance() {
     appearance.replaceChildren();
     const toggleLabel = node('label');
