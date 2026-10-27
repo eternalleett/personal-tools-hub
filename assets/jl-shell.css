@@ -27,3 +27,36 @@ body.jl-tool-page .jl-canvas .preview,body.jl-tool-page .jl-canvas #preview{min-
 }
 @media(max-width:999px){body.jl-tool-page .jl-two-column{display:grid;grid-template-columns:1fr;gap:15px}}
 @media(max-width:600px){body.jl-tool-page :is(.panel,.card){padding:15px}body.jl-tool-page .jl-bar{gap:7px;padding:10px}body.jl-tool-page .jl-toolbar-search{min-width:0}}
+
+/* ===== 2026 JL Toolkit design tokens and responsive workspace =====
+   Shared CSS applies to all tools. Page-specific rendering belongs in each tool's
+   index.html stylesheet. Control panels scroll independently only on wide screens.
+*/
+:root{--jl-link:#2752c4;--jl-focus:#366ad1}
+body.jl-dark{--jl-link:#a6d8ff;--jl-focus:#c7e8ff}
+body.jl-dark :is(a:not(.jl-bar a):not(.jl-menu a)){color:var(--jl-link)!important;text-decoration:underline;text-underline-offset:3px;font-weight:650}
+body.jl-dark a:hover{text-decoration-thickness:2px}
+body.jl-dark :is(.summary,.meta,.status,.muted,.hint,.note){color:#bccce1!important}
+body.jl-dark button.alt{background:#344a73!important;color:#f2f7ff!important}
+body.jl-dark button.warn{background:#572e3b!important;color:#ffe6e6!important}
+body.jl-dark .thumb{background:#263751!important;color:#f2f6ff!important}
+body.jl-dark table :is(td,th){color:#e6efff}
+body.jl-dark table th{background:#344666;color:#fff}
+body.jl-dark .pair,.jl-dark .pic,.jl-dark .jl-canvas{background:var(--jl-surface)!important}
+.jl-tool-page :is(.jl-canvas,#workspace){min-width:0}
+.jl-tool-page .jl-canvas :is(.preview,.jl-preview){min-height:310px}
+.jl-tool-page .jl-controls{min-width:0}
+.jl-tool-page .jl-canvas :is(#preview,#results,#previews){margin-left:auto;margin-right:auto}
+.jl-tool-page :is(.jl-canvas,.jl-controls) button{min-height:40px}
+.jl-tool-page .jl-edit-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+.jl-tool-page .editable-cell{cursor:text;outline-offset:-2px}
+.jl-tool-page .editable-cell:focus{outline:2px solid var(--jl-focus);background:#eaf4ff;color:#172b46}
+@media(min-width:1050px){
+  body.jl-tool-page .jl-two-column{grid-template-columns:minmax(260px,300px) minmax(0,1fr)}
+  body.jl-tool-page .jl-controls{max-height:calc(100vh - 105px);overflow:auto;scrollbar-width:thin}
+  body.jl-tool-page .jl-canvas{min-height:calc(100vh - 190px)}
+  body.jl-tool-page #stage{min-height:360px}
+  body.jl-tool-page .layout:has(>.controls){grid-template-columns:250px minmax(0,1fr) 260px}
+}
+@media(max-width:1049px){body.jl-tool-page .jl-controls{max-height:none;overflow:visible}}
+@media(max-width:650px){.jl-bar .jl-toolbar-search{font-size:12px}.jl-tool-page .jl-canvas .preview{min-height:240px}.jl-tool-page :is(.panel,.card){margin-bottom:10px}}
