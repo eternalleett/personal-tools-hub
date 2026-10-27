@@ -13,8 +13,8 @@ canvasPanel.insertBefore(indicator,canvasPanel.querySelector('#stage'));
 function updateIndicator(){
  const current=saved[active];
  indicator.textContent=current
-   ? 'Previewing label '+(active+1)+' of '+saved.length+': '+(model.name||current.name)
-   : 'Previewing unsaved label: '+(model.name||'Untitled label');
+   ? 'ACTIVE LABEL '+(active+1)+' / '+saved.length+' — '+(model.name||current.name)
+   : 'UNSAVED LABEL — '+(model.name||'Untitled label');
  indicator.dataset.selected=active<0?'unsaved':String(active);
 }
 const gallery=strip.querySelector('#jlLabelGallery'),message=strip.querySelector('#jlLabelMessage');
@@ -26,7 +26,7 @@ document.getElementById('jlLabelCount').textContent=String(saved.length);
 gallery.replaceChildren();
 saved.forEach((entry,i)=>{
 const card=document.createElement('div');card.className='jl-gallery-card'+(active===i?' active':'');
-const open=document.createElement('button');open.type='button';open.className='jl-gallery-open';open.title='Edit '+entry.name;
+const open=document.createElement('button');open.type='button';open.className='jl-gallery-open';open.setAttribute('aria-pressed',String(active===i));open.title='Edit '+entry.name;
 const thumb=document.createElement('div');thumb.className='jl-gallery-preview';
 const image=new DOMParser().parseFromString(entry.svg,'image/svg+xml').documentElement;
 if(image.nodeName.toLowerCase()==='svg')thumb.append(document.importNode(image,true));
@@ -36,11 +36,13 @@ open.onclick=()=>{
  if(active>=0 && active!==i && !selecting) synchronizeActive();
  selecting=true;
  active=-1;
- load(JSON.parse(JSON.stringify(saved[i].layout)));
+ const target=JSON.parse(JSON.stringify(saved[i].layout));
+ load(target);
  active=i;
  selecting=false;
- // Force a fresh canvas draw after selecting a different saved label.
+ // Redraw using the selected record and refresh its live thumbnail.
  draw();
+ synchronizeActive();
  renderGallery();
  message.textContent='Now previewing '+saved[i].name+' ('+(i+1)+' of '+saved.length+').';
 };
