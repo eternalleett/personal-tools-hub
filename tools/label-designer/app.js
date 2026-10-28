@@ -11,7 +11,7 @@ function add(type){let a={id:uid(),type,x:8,y:8,w:type==='text'?50:type==='qr'?2
 $('sizePreset').addEventListener('change',()=>{let v=$('sizePreset').value;if(!v)return;let [w,h]=v.split(',').map(Number);$('labelW').value=w;$('labelH').value=h;config()});function config(){let w=Number($('labelW').value),h=Number($('labelH').value);if(w<20||h<15||w>300||h>300)return setMsg('Size must be within 20–300 mm width and 15–300 mm height');model.width=w;model.height=h;model.name=$('name').value;refresh()}
 function valueChange(){let a=item();if(!a)return;a[a.type==='text'?'text':'value']=$('content').value;for(let k of ['x','y','w','h']){let v=Number($(k).value);if(Number.isFinite(v))a[k]=k==='w'||k==='h'?Math.max(1,v):v}a.color=$('color').value;if(a.type==='text'){a.fontSize=clamp(Number($('fontSize').value)||4,1,40);a.fontFamily=$('fontFamily').value;a.bold=$('bold').checked;a.italic=$('italic').checked;a.align=$('align').value}else a.rotate=Number($('rotate').value);refresh()}
 function point(ev){let p=$('design').createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;let m=$('design').getScreenCTM();return m?p.matrixTransform(m.inverse()):{x:0,y:0}}
-$('design').addEventListener('pointerdown',e=>{let g=e.target.closest('.item');if(!g)return;select(g.dataset.id);let a=item(),p=point(e);drag={id:a.id,x:a.x,y:a.y,startX:p.x,startY:p.y};$('design').setPointerCapture(e.pointerId);e.preventDefault()});$('design').addEventListener('pointermove',e=>{if(!drag)return;let a=item();if(!a||a.id!==drag.id)return;let p=point(e);a.x=Math.round((drag.x+(p.x-drag.startX)/4)*10)/10;a.y=Math.round((drag.y+(p.y-drag.startY)/4)*10)/10;$('x').value=a.x;$('y').value=a.y;draw()});$('design').addEventListener('pointerup',()=>{drag=null;refresh()});$('design').addEventListener('pointercancel',()=>{drag=null;refresh()});document.addEventListener('keydown',e=>{let a=item();if(!a||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||/input|textarea|select/i.test(document.activeElement.tagName))return;let delta=e.shiftKey?2:.5;if(e.key==='ArrowLeft')a.x-=delta;if(e.key==='ArrowRight')a.x+=delta;if(e.key==='ArrowUp')a.y-=delta;if(e.key==='ArrowDown')a.y+=delta;e.preventDefault();select(a.id)});
+$('stage').addEventListener('pointerdown',e=>{let g=e.target.closest('.item');if(!g)return;select(g.dataset.id);let a=item(),p=point(e);drag={id:a.id,x:a.x,y:a.y,startX:p.x,startY:p.y};$('design').setPointerCapture(e.pointerId);e.preventDefault()});$('stage').addEventListener('pointermove',e=>{if(!drag)return;let a=item();if(!a||a.id!==drag.id)return;let p=point(e);a.x=Math.round((drag.x+(p.x-drag.startX)/4)*10)/10;a.y=Math.round((drag.y+(p.y-drag.startY)/4)*10)/10;$('x').value=a.x;$('y').value=a.y;draw()});$('stage').addEventListener('pointerup',()=>{drag=null;refresh()});$('stage').addEventListener('pointercancel',()=>{drag=null;refresh()});document.addEventListener('keydown',e=>{let a=item();if(!a||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||/input|textarea|select/i.test(document.activeElement.tagName))return;let delta=e.shiftKey?2:.5;if(e.key==='ArrowLeft')a.x-=delta;if(e.key==='ArrowRight')a.x+=delta;if(e.key==='ArrowUp')a.y-=delta;if(e.key==='ArrowDown')a.y+=delta;e.preventDefault();select(a.id)});
 $('addText').onclick=()=>add('text');$('addQr').onclick=()=>add('qr');$('addBarcode').onclick=()=>add('barcode');for(let k of ['x','y','w','h','content','color','fontSize','fontFamily','bold','italic','align','rotate'])$(k).addEventListener('input',valueChange);for(let k of ['labelW','labelH','name'])$(k).addEventListener('change',config);
 $('remove').onclick=()=>{model.elements=model.elements.filter(a=>a.id!==selected);select(null)};function shift(n){let i=model.elements.findIndex(a=>a.id===selected),j=i+n;if(i<0||j<0||j>=model.elements.length)return;[model.elements[i],model.elements[j]]=[model.elements[j],model.elements[i]];refresh()}$('up').onclick=()=>shift(1);$('down').onclick=()=>shift(-1);
 function valid(m){if(!m||!Array.isArray(m.elements)||!Number.isFinite(Number(m.width))||!Number.isFinite(Number(m.height))||Number(m.width)<20||Number(m.height)<15||Number(m.width)>300||Number(m.height)>300||m.elements.length>500)throw Error('Invalid layout dimensions or elements');let els=m.elements.map(e=>{if(!['text','qr','barcode'].includes(e.type))throw Error('Unknown element type');return{...e,id:uid(),x:Number(e.x)||0,y:Number(e.y)||0,w:Math.max(1,Number(e.w)||10),h:Math.max(1,Number(e.h)||10),text:String(e.text||''),value:String(e.value||''),color:/^#[0-9a-fA-F]{6}$/.test(e.color)?e.color:'#111111',fontSize:Number(e.fontSize)||4}});return{version:1,name:String(m.name||'Imported layout'),width:Number(m.width),height:Number(m.height),elements:els}}function load(m){
@@ -37,10 +37,13 @@ function valid(m){if(!m||!Array.isArray(m.elements)||!Number.isFinite(Number(m.w
 window.JLLabelEditor={
  loadLayout(layout){
    const loaded=load(JSON.parse(JSON.stringify(layout)));
-   // Reset SVG content while retaining its pointer/drag event listeners.
-   const canvas=$('design');
-   canvas.replaceChildren();
-   canvas.removeAttribute('viewBox');
+   // Force a new SVG root so the browser cannot reuse a stale SVG paint layer.
+   // Pointer handlers are delegated to #stage and survive the replacement.
+   const oldCanvas=$('design');
+   const newCanvas=document.createElementNS(NS,'svg');
+   newCanvas.id='design';
+   newCanvas.setAttribute('xmlns',NS);
+   oldCanvas.replaceWith(newCanvas);
    draw();
    list();
    return loaded;
@@ -69,7 +72,11 @@ clearTimeout(historyTimer);pushHistory();historyButtons();
 
 /* Manual preview refresh retains the currently edited document. */
 $('refreshCanvas').addEventListener('click',()=>{
-  $('design').replaceChildren();
+  const previous=$('design');
+  const replacement=document.createElementNS(NS,'svg');
+  replacement.id='design';
+  replacement.setAttribute('xmlns',NS);
+  previous.replaceWith(replacement);
   draw();
   list();
   setMsg('Live canvas refreshed: '+model.name);
