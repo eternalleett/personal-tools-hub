@@ -66,3 +66,11 @@ async function simulateDpi(){try{let dpi=Number($('previewDpi').value);let width
 $('simulate').onclick=simulateDpi;$('previewDpi').onchange=()=>{simBlob=null};$('saveSimulation').onclick=async()=>{if(!simBlob)await simulateDpi();if(simBlob)save(simBlob,'thermal-preview-'+$('previewDpi').value+'dpi.png')};
 load({version:1,name:'Untitled Label',width:100,height:60,elements:[{id:'first',type:'text',x:5,y:5,w:50,h:10,text:'YOUR LABEL',fontSize:6,bold:true,italic:false,fontFamily:'sans-serif',color:'#111111'},{id:'second',type:'qr',x:65,y:10,w:28,h:28,value:'https://example.com',color:'#111111'}]});
 clearTimeout(historyTimer);pushHistory();historyButtons();
+
+/* Manual preview refresh retains the currently edited document. */
+$('refreshCanvas').addEventListener('click',()=>{
+  $('design').replaceChildren();
+  draw();
+  list();
+  setMsg('Live canvas refreshed: '+model.name);
+});
