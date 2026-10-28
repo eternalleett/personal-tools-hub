@@ -37,7 +37,14 @@ function valid(m){if(!m||!Array.isArray(m.elements)||!Number.isFinite(Number(m.w
 window.JLLabelEditor={
  loadLayout(layout){
    const loaded=load(JSON.parse(JSON.stringify(layout)));
+   // Recreate the SVG root on every document switch to eliminate stale DOM.
+   const previous=$('design');
+   const fresh=document.createElementNS(NS,'svg');
+   fresh.id='design';
+   fresh.setAttribute('xmlns',NS);
+   previous.replaceWith(fresh);
    draw();
+   list();
    return loaded;
  },
  currentLayout(){return JSON.parse(JSON.stringify(model))}
