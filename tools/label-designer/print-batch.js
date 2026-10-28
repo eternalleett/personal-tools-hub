@@ -29,7 +29,7 @@ const card=document.createElement('div');card.className='jl-gallery-card'+(activ
 const open=document.createElement('button');open.type='button';open.className='jl-gallery-open';open.setAttribute('aria-pressed',String(active===i));open.title='Edit '+entry.name;
 const thumb=document.createElement('div');thumb.className='jl-gallery-preview';
 const image=new DOMParser().parseFromString(entry.svg,'image/svg+xml').documentElement;
-if(image.nodeName.toLowerCase()==='svg')thumb.append(document.importNode(image,true));
+if(image.nodeName.toLowerCase()==='svg'){image.removeAttribute('id');thumb.append(document.importNode(image,true));}
 const name=document.createElement('span');name.className='jl-gallery-name';name.textContent=entry.name;open.append(thumb,name);
 open.onclick=()=>{
  clearTimeout(updateTimer);
@@ -85,7 +85,7 @@ function synchronizeActive(){
  const label=card.querySelector('.jl-gallery-name');
  if(preview){
    const svg=new DOMParser().parseFromString(saved[active].svg,'image/svg+xml').documentElement;
-   if(svg.nodeName.toLowerCase()==='svg')preview.replaceChildren(document.importNode(svg,true));
+   if(svg.nodeName.toLowerCase()==='svg'){svg.removeAttribute('id');preview.replaceChildren(document.importNode(svg,true));}
  }
  if(label)label.textContent=saved[active].name;
  updateIndicator();
