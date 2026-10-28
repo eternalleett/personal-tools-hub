@@ -185,3 +185,6 @@ body :is(.jl-launcher,.jl-feature){
   border-color:color-mix(in srgb,var(--jl-main) 65%,var(--jl-surface) 35%)!important;
 }
 body.jl-tool-page::after{display:none!important}
+
+/* Cover legacy tools whose body lacks the jl-tool-page class. */
+body :is(.card,.panel){border-color:color-mix(in srgb,var(--jl-main) 65%,var(--jl-surface) 35%)!important}
