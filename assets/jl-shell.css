@@ -171,3 +171,17 @@ body :is(input:not([type=color]),select,textarea){color:var(--jl-ink);border-col
 .jl-active-label{display:flex;align-items:center;gap:9px;padding:10px 13px;margin:10px 0 12px;border-radius:10px;border:1px solid var(--jl-border);background:var(--jl-main);color:var(--jl-ink);font-weight:700;font-size:13px}
 .jl-active-label::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--jl-accent);flex:none}
 .jl-gallery-card.active{box-shadow:0 0 0 2px var(--jl-accent)}
+
+/* Consistent page edges and unobtrusive panel outlines.
+ * The root, body and page containers must share the same theme surface so
+ * no pale strip appears below the workspace or during overscroll. */
+html,body{background-color:var(--jl-main)!important}
+html{min-height:100%;overscroll-behavior-y:none}
+body{min-height:100vh;box-shadow:none!important}
+body.jl-tool-page{margin:0!important}
+body.jl-tool-page :is(main,.page,.wrap){background:transparent!important}
+body.jl-tool-page :is(.panel,.card),
+body :is(.jl-launcher,.jl-feature){
+  border-color:color-mix(in srgb,var(--jl-main) 65%,var(--jl-surface) 35%)!important;
+}
+body.jl-tool-page::after{display:none!important}
