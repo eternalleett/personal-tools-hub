@@ -120,7 +120,7 @@ function createCat(){
  if(!sceneState)return;
  const state=sceneState;
  if(state.cat){state.scene.remove(state.cat);state.cat.traverse(obj=>{obj.geometry?.dispose();if(obj.material&&!Array.isArray(obj.material))obj.material.dispose?.()})}
- const coat=palette(),cat=new THREE.Group(),tail=new THREE.Group(),head=new THREE.Group();
+ const coat=palette(),cat=new THREE.Group(),tail=new THREE.Group(),head=new THREE.Group(),spots=[];
  const bodyMat=new THREE.MeshStandardMaterial({color:coat.body,roughness:.82,flatShading:$('catStyle').value!=='rounded'});
  const lightMat=new THREE.MeshStandardMaterial({color:'#fff4de',roughness:.9});
  const spotMat=new THREE.MeshStandardMaterial({color:coat.spot,roughness:.85});
@@ -169,14 +169,18 @@ function createCat(){
     const depth=.53*Math.sqrt(1-radial*.92);
     const block=new THREE.Mesh(new THREE.BoxGeometry(.052,.052,.055),spotMat);
     block.position.set(nx*.64,.22-ny*.72,depth);
-    block.userData.qrCoord={x:(nx*.64),y:(.22-ny*.72)};
+    const target=new THREE.Vector3(nx*.64,.22-ny*.72,depth);
+    const source=new THREE.Vector3(nx*.98,1.0-ny*.98,1.55);
+    block.userData.target=target;block.userData.source=source;
+    block.position.copy(source);
+    spots.push(block);
     cat.add(block);
    }
   }
  }else if($('catColor').value==='orange'){
   for(let i=-2;i<=2;i++)part(head,spotMat,[i*.19,.38,.49],[.07,.20,.055]);
  }
- state.cat=cat;state.head=head;state.tail=tail;
+ state.cat=cat;state.head=head;state.tail=tail;state.spots=spots;state.morphStart=performance.now();
  state.scene.add(cat);cat.position.y=.18;
 }
 async function loadScene(){
@@ -210,6 +214,14 @@ async function loadScene(){
    if(!sceneState)return;
    const t=(time-sceneState.start)/1000,cat=sceneState.cat,anim=$('catAnimation').value;
    if(cat){
+    if(sceneState.spots?.length){
+      const progress=Math.max(0,Math.min(1,(time-sceneState.morphStart)/1400));
+      const eased=1-Math.pow(1-progress,3);
+      for(const block of sceneState.spots){
+        block.position.lerpVectors(block.userData.source,block.userData.target,eased);
+        block.scale.setScalar(.3+.7*eased);
+      }
+    }
     const motion=reduceMotion?.2:1;
     cat.rotation.y=orbit.angle+(anim==='spin'?t*.8:Math.sin(t*.7)*.08)*motion;
     cat.position.y=.18+(anim==='jump'?Math.abs(Math.sin(t*2))*1.1:anim==='walk'?Math.abs(Math.sin(t*3))*.09:Math.sin(t*1.7)*.055)*motion;
