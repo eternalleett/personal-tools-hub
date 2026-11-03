@@ -1,7 +1,7 @@
 /* Horizontal QR/barcode collection with save, edit, create and delete. */
 (()=>{
 'use strict';
-const panel=document.getElementById('preview').closest('.panel'),anchor=panel.querySelector('#singleResult');
+const panel=document.getElementById('catQrPane') || document.getElementById('preview').closest('.panel'),anchor=panel.querySelector('#singleResult');
 const section=document.createElement('section');section.className='jl-collection';
 section.innerHTML='<div class="jl-collection-header"><strong>My QR / barcodes</strong><div class="jl-collection-actions"><button id="jlSaveCode" type="button">Save current</button><button id="jlNewCode" type="button" class="alt">+ New code</button><button id="jlUpdateCode" type="button" class="alt">Update selected</button></div></div><div id="jlCodeGallery" class="jl-gallery"></div><p id="jlCodeMessage" class="hint"></p>';
 panel.insertBefore(section,anchor);
