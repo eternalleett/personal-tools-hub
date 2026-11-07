@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap');
-:root{--jl-top:#14213b;--jl-menu:#1d2d48;--jl-main:#f4f6fb;--jl-surface:#fff;--jl-ink:#1b2d46;--jl-accent:#4a5ed5}body.jl-dark{--jl-top:#080e1d;--jl-menu:#111c32;--jl-main:#101827;--jl-surface:#1b2940;--jl-ink:#edf3ff}body{background:var(--jl-main)!important;color:var(--jl-ink)!important}header{background:var(--jl-top)!important}.panel,.card{background:var(--jl-surface)!important;color:var(--jl-ink)!important}body.jl-dark input,body.jl-dark select,body.jl-dark textarea{background:#263650!important;color:#f4f7ff!important;border-color:#536480!important}body.jl-dark p,body.jl-dark .hint,body.jl-dark .note{color:#b1c1d8!important}.jl-bar{position:relative;z-index:100;display:flex;align-items:center;gap:12px;padding:12px 18px;background:var(--jl-top);color:white}.jl-bar a{color:white;text-decoration:none}.jl-bar button{border:1px solid #ffffff4c;background:transparent;color:white;min-height:38px;border-radius:8px;padding:7px 12px;cursor:pointer}.jl-menu{position:fixed;z-index:101;top:0;bottom:0;left:0;width:min(310px,88vw);padding:20px;background:var(--jl-menu);color:white;box-shadow:0 10px 50px #0005;overflow:auto;transform:translateX(-105%);transition:transform .18s}.jl-menu.open{transform:translateX(0)}.jl-menu a{display:block;color:white;text-decoration:none;padding:11px 9px;border-radius:9px}.jl-menu a:hover{background:#ffffff20}.jl-menu input{width:100%;padding:10px;border-radius:8px;box-sizing:border-box}.jl-shade{position:fixed;inset:0;background:#0008;z-index:100;display:none}.jl-shade.open{display:block}.jl-settings{padding:10px;border:1px solid #ffffff3f;border-radius:12px}.jl-settings label{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0;color:white}.jl-settings input[type=color]{width:55px;height:31px}.jl-search-results{margin-top:8px}.jl-toolbar-search{flex:1;max-width:420px;padding:9px;border-radius:9px;border:1px solid #c7d0dc}.jl-dark .preview{background:#293951!important}.jl-dark .card a{color:inherit!important}
+:root{--jl-top:#14213b;--jl-menu:#1d2d48;--jl-main:#f4f6fb;--jl-surface:#fff;--jl-ink:#1b2d46;--jl-accent:#4a5ed5}body.jl-dark{--jl-top:#080e1d;--jl-menu:#111c32;--jl-main:#101827;--jl-surface:#1b2940;--jl-ink:#edf3ff}body{background:var(--jl-main)!important;color:var(--jl-ink)!important}header{background:var(--jl-top)!important}.panel,.card{background:var(--jl-surface)!important;color:var(--jl-ink)!important}body.jl-dark input,body.jl-dark select,body.jl-dark textarea{background:#263650!important;color:#f4f7ff!important;border-color:#536480!important}body.jl-dark p,body.jl-dark .hint,body.jl-dark .note{color:#b1c1d8!important}.jl-bar{position:relative;z-index:100;display:flex;align-items:center;gap:12px;padding:12px 18px;background:var(--jl-top);color:white}.jl-bar a{color:white;text-decoration:none}.jl-bar button{border:1px solid #ffffff4c;background:transparent;color:white;min-height:38px;border-radius:8px;padding:7px 12px;cursor:pointer}.jl-menu{position:fixed;z-index:121;top:0;bottom:0;left:0;width:min(310px,88vw);padding:20px;background:var(--jl-menu);color:white;box-shadow:0 10px 50px #0005;overflow:auto;transform:translateX(-105%);transition:transform .18s}.jl-menu.open{transform:translateX(0)}.jl-menu a{display:block;color:white;text-decoration:none;padding:11px 9px;border-radius:9px}.jl-menu a:hover{background:#ffffff20}.jl-menu input{width:100%;padding:10px;border-radius:8px;box-sizing:border-box}.jl-shade{position:fixed;inset:0;background:#0008;z-index:120;display:none}.jl-shade.open{display:block}.jl-settings{padding:10px;border:1px solid #ffffff3f;border-radius:12px}.jl-settings label{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0;color:white}.jl-settings input[type=color]{width:55px;height:31px}.jl-search-results{margin-top:8px}.jl-toolbar-search{flex:1;max-width:420px;padding:9px;border-radius:9px;border:1px solid #c7d0dc}.jl-dark .preview{background:#293951!important}.jl-dark .card a{color:inherit!important}
 /* JL Toolkit unified workspace v2 */
 :root{--jl-line:#dce4ef;--jl-radius:16px;--jl-muted:#66758b}
 body.jl-tool-page{min-height:100vh;background:var(--jl-main)!important;color:var(--jl-ink)!important}
@@ -75,7 +75,7 @@ body.jl-dark .pair,.jl-dark .pic,.jl-dark .jl-canvas{background:var(--jl-surface
 .jl-theme-popover label{color:white!important}
 .jl-bar+main,.jl-bar+.page,.jl-bar+.wrap{scroll-margin-top:75px}
 .jl-tool-page .card,.jl-tool-page .panel{max-width:100%;overflow-wrap:anywhere}
-.jl-tool-page input[type=file]{display:block;box-sizing:border-box;width:100%!important;max-width:100%;min-width:0;overflow:hidden;white-space:normal;line-height:1.6}
+.jl-tool-page input[type=file]:not(.jl-input-hidden){display:block;box-sizing:border-box;width:100%!important;max-width:100%;min-width:0;overflow:hidden;white-space:normal;line-height:1.6}
 .jl-tool-page input[type=file]::file-selector-button{background:var(--jl-accent);border:0;border-radius:8px;color:white;padding:9px 10px;margin-right:10px;cursor:pointer}
 .jl-tool-page .options,.jl-tool-page .row{min-width:0;flex-wrap:wrap}
 .jl-tool-page .jl-controls :is(input,select,textarea){max-width:100%;box-sizing:border-box}
@@ -111,7 +111,7 @@ html.jl-dark body a:not(.jl-bar a):not(.jl-menu a){color:var(--jl-link)!importan
 }
 
 /* Input file overflow repair: native file controls have an intrinsic min width. */
-.jl-tool-page input[type="file"]{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important;font-size:12px!important;white-space:normal!important;overflow:hidden!important;color:var(--jl-ink)}
+.jl-tool-page input[type="file"]:not(.jl-input-hidden){display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important;font-size:12px!important;white-space:normal!important;overflow:hidden!important;color:var(--jl-ink)}
 .jl-tool-page input[type="file"]::file-selector-button{max-width:100%;font:inherit;margin:0 6px 4px 0;padding:8px;border-radius:7px}
 .jl-controls,.jl-controls label,.jl-controls .options{min-width:0;max-width:100%;overflow-wrap:anywhere}
 :root{--jl-font:system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -188,3 +188,11 @@ body.jl-tool-page::after{display:none!important}
 
 /* Cover legacy tools whose body lacks the jl-tool-page class. */
 body :is(.card,.panel){border-color:color-mix(in srgb,var(--jl-main) 65%,var(--jl-surface) 35%)!important}
+
+/* Shared secondary states must override page-specific accent backgrounds. */
+body.jl-tool-page button.alt,
+body.jl-tool-page .jl-cat-preview-tabs button:not(.cat-active),
+body.jl-tool-page .jl-view-tabs button:not(.jl-tab-active){background:var(--jl-surface)!important;color:var(--jl-ink)!important;border:1px solid var(--jl-border)}
+
+body.jl-tool-page .itemList button{background:var(--jl-surface)!important;color:var(--jl-ink)!important}
+body.jl-tool-page .itemList button.active{outline:2px solid var(--jl-accent);outline-offset:-2px}

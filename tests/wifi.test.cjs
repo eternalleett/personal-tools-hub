@@ -1,0 +1,32 @@
+// Run with: node tests/wifi.test.cjs
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const elements = new Map();
+const get = id => {
+  if (!elements.has(id)) elements.set(id, {value:'', checked:false, hidden:false, disabled:false, addEventListener(){}});
+  return elements.get(id);
+};
+get('payload').value = 'https://example.com/keep';
+get('wifiSecurity').value = 'WPA';
+const scope = {window:{}, document:{getElementById:get}, btoa:s=>Buffer.from(s).toString('base64'), render(){}, tab(){}, status(){}};
+vm.createContext(scope);
+vm.runInContext(fs.readFileSync('tools/qr-barcode/wifi.js','utf8'), scope);
+const wifi = scope.window.JLWiFi;
+assert.equal(wifi.payload({ssid:'JL 測試;:"\\',password:'p;:123',security:'WPA',hidden:true}), 'WIFI:T:WPA;S:JL 測試\\;\\:\\"\\\\;P:p\\;\\:123;H:true;;');
+assert.equal(wifi.payload({ssid:'Guest',password:'ignored',security:'nopass',hidden:false}), 'WIFI:T:nopass;S:Guest;H:false;;');
+assert.throws(()=>wifi.payload({ssid:' ',password:'p',security:'WPA'}), /SSID/);
+assert.throws(()=>wifi.payload({ssid:'JL',password:'',security:'WPA'}), /password/);
+assert.throws(()=>wifi.payload({ssid:'JL',password:'p',security:'unknown'}), /Unsupported/);
+const encoded=wifi.payload({ssid:'JL 測試;:"\\',password:'p;:123',security:'WPA',hidden:true});
+assert.equal(wifi.restore(encoded),true);
+assert.equal(get('wifiSsid').value,'JL 測試;:"\\');
+assert.equal(get('wifiPassword').value,'p;:123');
+assert.equal(get('wifiHidden').checked,true);
+get('qrMode').value='text';get('qrMode').onchange();
+assert.equal(get('payload').value,'https://example.com/keep');
+wifi.restore('WIFI:T:nopass;S:Guest;H:false;;');
+assert.equal(get('wifiPassword').disabled,true);
+wifi.restore('WIFI:T:WPA;S:Private;P:12345678;H:false;;');
+assert.equal(get('wifiPassword').disabled,false);
+console.log('Wi-Fi payload, escaping, restore, validation and mode checks passed.');

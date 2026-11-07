@@ -19,7 +19,14 @@
       ';H:' + (hidden === true || hidden === 'true' || hidden === '1' ? 'true' : 'false') + ';;';
   }
   window.JLWiFi = { payload, logo };
+  let textPayload = $('payload').value;
+  function syncSecurity() {
+    $('wifiPassword').disabled = $('wifiSecurity').value === 'nopass';
+  }
   function setMode(next) {
+    if (next === 'wifi' && window.JL_WIFI_MODE !== 'wifi') textPayload = $('payload').value;
+    if (next === 'text' && window.JL_WIFI_MODE === 'wifi') $('payload').value = textPayload;
+    syncSecurity();
     window.JL_WIFI_MODE = next;
     $('qrMode').value = next;
     $('wifiFields').hidden = next !== 'wifi';
@@ -28,7 +35,7 @@
     if (next === 'wifi') {
       $('ecc').value = 'H';
       if (!$('caption').value || $('caption').value === 'Sample code')
-        $('caption').value = 'Wi-Fi: ' + $('wifiSsid').value;
+        $('caption').value = 'Wi-Fi: ' + ($('wifiSsid').value || 'network');
     }
     render();
   }
@@ -36,7 +43,7 @@
   for (const id of ['wifiSsid','wifiPassword','wifiSecurity','wifiHidden']) {
     $(id).addEventListener('input', () => {
       if (id === 'wifiSecurity') {
-        $('wifiPassword').disabled = $('wifiSecurity').value === 'nopass';
+        syncSecurity();
       }
       if (window.JL_WIFI_MODE === 'wifi') render();
     });
@@ -50,12 +57,16 @@
     try {
       const records = parseCsv(await file.text());
       if (records.length && records[0][0]?.trim().toLowerCase() === 'ssid') records.shift();
-      imported = records.filter(r => r.some(x => x.trim())).map(r => ({
+      const nextImported = records.filter(r => r.some(x => x.trim())).map(r => ({
         value: payload({ssid:r[0],password:r[1],security:normalizeSecurity(r[2]),hidden:(r[3]||'').trim().toLowerCase()}),
         label:r[4] || 'Wi-Fi: ' + r[0], type:'qr', wifi:true
       }));
+      if (!nextImported.length) throw Error('CSV contains no Wi-Fi networks');
+      imported = nextImported;
+      if (window.JL_WIFI_MODE === 'wifi') $('payload').value = textPayload;
       window.JL_WIFI_MODE = 'text';
       $('qrMode').value = 'text';$('wifiFields').hidden = true;$('normalPayload').hidden=false;
+      $('type').value = 'qr';
       tab('bulk');
       status('Loaded '+imported.length+' Wi-Fi QR code(s). Each will use the Wi-Fi icon.');
     } catch (error) { status('Wi-Fi CSV error: '+error.message); }
