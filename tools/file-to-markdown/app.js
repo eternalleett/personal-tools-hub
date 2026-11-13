@@ -78,6 +78,43 @@ function downloadOne(x){if(x.status!=='done')return;update(x,'exporting',95,'Exp
 $('downloadOne').onclick=()=>{if(chosen)downloadOne(chosen);};
 $('copy').onclick=async()=>{if(chosen)try{await navigator.clipboard.writeText(chosen.md);$('previewInfo').textContent='Copied Markdown';}catch(e){$('previewInfo').textContent='Clipboard unavailable; copy from preview.';}};
 $('exportCombined').onclick=()=>{const docs=completed();if(busy||!docs.length)return;const text=docs.map(x=>'<!-- Source: '+x.file.name.replace(/-->/g,'')+' -->\n\n'+x.md).join('\n\n---\n\n');save(new Blob([text],{type:'text/markdown;charset=utf-8'}),'combined-documents.md');};
-$('exportZip').onclick=async()=>{const docs=completed();if(busy||!docs.length)return;if(!window.JSZip){$('summary').textContent='ZIP library unavailable';return;}busy=true;const zip=new JSZip(),names=new Map();for(const x of docs){const base=basename(x.file.name),n=names.get(base)||0;names.set(base,n+1);zip.file(base+(n?'-'+(n+1):'')+'.md',x.md);update(x,'exporting',0,'Preparing ZIP');}try{const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE'},m=>{for(const x of docs)update(x,'exporting',Math.min(99,m.percent),'Packing '+Math.floor(m.percent)+'%');});save(blob,'markdown-files.zip');for(const x of docs)update(x,'done',100,'✓ ZIP download started');}catch(e){for(const x of docs){x.error=String(e);update(x,'error',x.progress,'ZIP failed');}}finally{busy=false;render();}};
+// Small dependency-free ZIP writer (STORE method) so bulk export works even when CDNs are unavailable.
+function makeZip(files,onProgress){
+const encoder=new TextEncoder(),crcTable=new Uint32Array(256);
+for(let n=0;n<256;n++){let c=n;for(let j=0;j<8;j++)c=c&1?0xEDB88320^(c>>>1):c>>>1;crcTable[n]=c>>>0;}
+function crc(bytes){let c=0xFFFFFFFF;for(const b of bytes)c=crcTable[(c^b)&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+const chunks=[],central=[];let offset=0;
+for(let i=0;i<files.length;i++){
+const name=encoder.encode(files[i].name),data=encoder.encode(files[i].md),checksum=crc(data);
+if(data.length>0xFFFFFFFF||name.length>0xFFFF)throw Error('ZIP entry too large');
+const head=new Uint8Array(30+name.length),v=new DataView(head.buffer);
+v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(6,0x800,true);
+v.setUint32(14,checksum,true);v.setUint32(18,data.length,true);v.setUint32(22,data.length,true);v.setUint16(26,name.length,true);head.set(name,30);
+chunks.push(head,data);
+const dir=new Uint8Array(46+name.length),d=new DataView(dir.buffer);
+d.setUint32(0,0x02014b50,true);d.setUint16(4,20,true);d.setUint16(6,20,true);d.setUint16(8,0x800,true);
+d.setUint32(16,checksum,true);d.setUint32(20,data.length,true);d.setUint32(24,data.length,true);d.setUint16(28,name.length,true);d.setUint32(42,offset,true);dir.set(name,46);
+central.push(dir);offset+=head.length+data.length;onProgress((i+1)/files.length*95);
+}
+const centralSize=central.reduce((n,x)=>n+x.length,0);
+const footer=new Uint8Array(22),e=new DataView(footer.buffer);
+if(files.length>65535||offset+centralSize>0xFFFFFFFF)throw Error('ZIP too large');
+e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);
+e.setUint32(12,centralSize,true);e.setUint32(16,offset,true);
+return new Blob([...chunks,...central,footer],{type:'application/zip'});
+}
+$('exportZip').onclick=async()=>{
+const docs=completed();if(busy||!docs.length)return;
+busy=true;sync();const names=new Map(),entries=[];
+for(const x of docs){const base=basename(x.file.name),n=names.get(base)||0;names.set(base,n+1);entries.push({name:base+(n?'-'+(n+1):'')+'.md',md:x.md});update(x,'exporting',0,'Preparing ZIP');}
+try{
+let blob;
+if(window.JSZip){const zip=new JSZip();for(const e of entries)zip.file(e.name,e.md);
+blob=await zip.generateAsync({type:'blob',compression:'DEFLATE'},m=>{for(const x of docs)update(x,'exporting',Math.min(99,m.percent),'Packing '+Math.floor(m.percent)+'%');});
+}else{blob=makeZip(entries,p=>{for(const x of docs)update(x,'exporting',p,'Packing '+Math.floor(p)+'%');});}
+save(blob,'markdown-files.zip');for(const x of docs)update(x,'done',100,'✓ ZIP download started');
+}catch(e){for(const x of docs){x.error=String(e);update(x,'error',x.progress,'ZIP failed');}}
+finally{busy=false;render();}
+};
 render();
 })();
