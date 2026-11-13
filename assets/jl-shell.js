@@ -17,6 +17,7 @@
 
   // Search keywords include alternate terminology used in everyday workflows.
   const tools = [
+    { name: 'File to Markdown', path: 'tools/file-to-markdown/', keywords: 'markdown md ai pdf word docx xlsx excel csv html image OCR batch bulk zip text files' },
     { name: 'QR & Barcode Generator', path: 'tools/qr-barcode/', keywords: 'qr barcode link url code128 batch wifi wi-fi network join 無線網絡 條碼 二維碼' },
     { name: 'PDF Toolkit', path: 'tools/pdf-toolkit/', keywords: 'pdf merge split reorder watermark word excel ppt markdown 合併 浮水印' },
     { name: 'Image Toolkit', path: 'tools/image-toolkit/', keywords: 'image photo jpg png webp avif bmp ico conversion resize compression 圖片' },
